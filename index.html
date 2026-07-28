@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>班主任上课提醒看板</title>
+<script>
+  (function(){
+    function pad(n){ return String(n).padStart(2,'0'); }
+    var d = new Date();
+    var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    var name = '上课提醒看板_' + ds + '.html';
+    location.href = encodeURI(name);
+  })();
+</script>
+</head>
+<body style="font-family:sans-serif;padding:40px">正在跳转到今日看板... 若未自动跳转，请稍候。</body>
+</html>
