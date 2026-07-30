@@ -1,10 +1,43 @@
 {
   "date": "2026-07-30",
-  "generated_at": "2026-07-29 08:00:33",
+  "generated_at": "2026-07-30 08:20:03",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-07-29 08:00:33",
+  "count": 2,
+  "total": 2,
+  "last_patrol": "2026-07-30 08:20:03",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "叶汝杰",
+      "group": "港澳2组",
+      "student": "Cayden",
+      "wandou_id": "28447201",
+      "start": "08:00",
+      "end": "08:40",
+      "minutes": 20,
+      "teacher": "Celina老师（武子会）",
+      "course": "S9_4 冰山一角",
+      "live_id": 17382304,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "叶汝杰",
+      "group": "港澳2组",
+      "student": "Julian",
+      "wandou_id": "28651545",
+      "start": "08:00",
+      "end": "08:40",
+      "minutes": 20,
+      "teacher": "阿蕃老师（李欢）",
+      "course": "S7_6 过关斩将",
+      "live_id": 17398253,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    }
+  ]
 }
