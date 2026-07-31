@@ -1,10 +1,10 @@
 {
   "date": "2026-08-02",
-  "generated_at": "2026-07-31 00:09:08",
+  "generated_at": "2026-07-31 08:00:08",
   "grace": 3,
   "count": 0,
   "total": 0,
-  "last_patrol": "2026-07-31 00:09:08",
+  "last_patrol": "2026-07-31 08:00:08",
   "daemon_ok": true,
   "late": []
 }
