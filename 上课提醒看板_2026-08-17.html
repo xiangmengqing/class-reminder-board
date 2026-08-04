@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>班主任上课提醒看板 · 2026-08-17</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#f1f5f9; color:#0f172a; padding:20px; }
+  .container { max-width:1280px; margin:0 auto; }
+  h1 { font-size:22px; margin-bottom:4px; }
+  .sub { color:#64748b; font-size:13px; margin-bottom:16px; }
+  .datebar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .datebar .db-lbl { font-size:13px; color:#64748b; }
+  .db-btn { padding:6px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; text-decoration:none; color:#334155; background:#fff; }
+  .db-btn:hover { background:#f1f5f9; }
+  .db-btn.active { background:#3b82f6; color:#fff; border-color:#2563eb; }
+  .db-links { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .db-select { display:none; padding:7px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; background:#fff; max-width:62vw; }
+  .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0 6px; }
+  .toolbar button { padding:7px 14px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; background:#fff; color:#334155; cursor:pointer; font-weight:600; }
+  .toolbar button:hover { background:#f1f5f9; }
+  .toolbar button:disabled { opacity:.6; cursor:default; }
+  .toolbar .refresh-msg { font-size:12px; color:#64748b; }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .card { background:#fff; border-radius:10px; padding:14px 20px; box-shadow:0 1px 3px rgba(0,0,0,.08); min-width:130px; }
+  .card .num { font-size:26px; font-weight:700; }
+  .card .lbl { font-size:12px; color:#64748b; margin-top:2px; }
+  .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+  select, input[type=text] { padding:7px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; background:#fff; }
+  .chip { padding:6px 12px; border-radius:999px; font-size:12px; cursor:pointer; border:1px solid #cbd5e1; background:#fff; user-select:none; }
+  .chip.on { background:#0f172a; color:#fff; border-color:#0f172a; }
+  .timeline { margin-bottom:16px; background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .tl-title { font-size:13px; color:#64748b; margin-bottom:8px; }
+  .tl-bars { display:flex; align-items:flex-end; gap:6px; height:70px; }
+  .tl-bar { flex:1; background:#3b82f6; border-radius:4px 4px 0 0; position:relative; min-width:18px; cursor:pointer; }
+  .tl-bar span { position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:11px; color:#334155; }
+  .tl-bar em { position:absolute; bottom:-18px; left:50%; transform:translateX(-50%); font-size:10px; font-style:normal; color:#94a3b8; white-space:nowrap; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  th { background:#0f172a; color:#fff; font-size:13px; padding:10px 12px; text-align:left; position:sticky; top:0; }
+  .hint { display:inline-block; margin-left:5px; width:15px; height:15px; line-height:15px; text-align:center; border-radius:50%; background:#475569; color:#fff; font-size:10px; font-style:italic; font-weight:700; cursor:help; vertical-align:middle; }
+  .hint:hover { background:#2563eb; }
+  td { padding:9px 12px; font-size:13px; border-bottom:1px solid #f1f5f9; }
+  tr:hover td { background:#f8fafc; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+  .time-cell { font-weight:700; font-variant-numeric:tabular-nums; }
+  .soon td { background:#fffbeb !important; }
+  .row-late td { background:#fff1f2 !important; }
+  .row-late td:first-child { border-left:4px solid #dc2626; }
+  .muted { color:#94a3b8; }
+  .hist-toggle { margin-top:12px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; color:#475569; cursor:pointer; user-select:none; font-weight:600; }
+  .hist-toggle:hover { background:#f1f5f9; }
+  .abn-box { background:#fff7ed; border:1px solid #fdba74; border-radius:10px; padding:12px 16px; margin-bottom:14px; }
+  .abn-summary { font-size:13px; color:#7c2d12; margin-bottom:10px; font-weight:600; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .abn-summary select { padding:4px 8px; border:1px solid #fdba74; border-radius:6px; background:#fff; color:#7c2d12; font-size:12px; font-weight:600; }
+  .abn-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; }
+  .abn-section { background:#fff; border:1px solid #fed7aa; border-radius:8px; padding:10px 12px; }
+  .abn-section-title { font-size:12px; font-weight:700; color:#9a3412; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+  .abn-row { display:flex; align-items:center; gap:8px; font-size:12px; padding:4px 0; border-bottom:1px solid #fff7ed; }
+  .abn-row:last-child { border-bottom:none; }
+  .abn-time { font-weight:700; color:#c2410c; min-width:40px; }
+  .abn-student { flex:1; min-width:0; }
+  .abn-student b { margin-right:4px; }
+  .abn-student .muted { font-size:11px; }
+  .abn-reason { display:inline-block; padding:1px 6px; border-radius:4px; background:#fef3c7; color:#92400e; font-size:11px; margin-left:4px; }
+  .abn-lp { color:#64748b; font-size:11px; white-space:nowrap; }
+  .sched-box { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 16px; margin-bottom:14px; }
+  .sched-head { font-size:14px; font-weight:700; color:#15803d; margin-bottom:4px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .sched-head .muted { font-size:12px; color:#64748b; font-weight:400; }
+  .sched-status-chip { display:inline-flex; gap:6px; align-items:center; margin:0 8px; }
+  .sched-status-chip span { cursor:pointer; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:600; border:1px solid #bbf7d0; color:#166534; background:#fff; }
+  .sched-status-chip span.active { background:#16a34a; color:#fff; border-color:#16a34a; }
+  .sched-status-chip span .cnt { font-size:11px; opacity:.8; margin-left:2px; }
+  .abn-chip { cursor:pointer; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:600; border:1px solid #fed7aa; color:#9a3412; background:#fff; }
+  .abn-chip.active { background:#c2410c; color:#fff; border-color:#c2410c; }
+  .abn-chip .cnt { font-size:11px; opacity:.8; margin-left:2px; }
+  .sched-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:10px; margin-top:8px; }
+  .sched-section { background:#fff; border:1px solid #bbf7d0; border-radius:8px; padding:10px 12px; }
+  .sched-section-title { font-size:12px; font-weight:700; color:#166534; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+  .sched-list { columns:2 240px; column-gap:12px; }
+  .sched-row { display:flex; align-items:center; gap:8px; font-size:12px; padding:4px 0; border-bottom:1px solid #f0fdf4; break-inside:avoid; }
+  .sched-row:last-child { border-bottom:none; }
+  .sched-time { font-weight:700; color:#15803d; min-width:40px; }
+  .sched-student { flex:1; min-width:0; }
+  .sched-student b { margin-right:4px; }
+  .sched-student .muted { font-size:11px; }
+  .sched-lp { color:#64748b; font-size:11px; white-space:nowrap; }
+  .leave-badge { font-size:11px; color:#b45309; margin-top:2px; }
+  .leave-badge.hf { color:#fff; background:#dc2626; padding:1px 6px; border-radius:4px; display:inline-block; font-weight:600; margin-top:2px; }
+  .lang-tag { display:inline-block; padding:1px 7px; border-radius:4px; font-size:11px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+  .long-stop td { color:#be123c !important; font-weight:700; }
+  .long-stop td .muted { color:#f43f5e !important; }
+  .super-long { color:#c2410c; font-weight:700; }
+  .tab-nav { display:flex; gap:8px; margin:14px 0 12px; border-bottom:2px solid #e2e8f0; padding-bottom:8px; }
+  .tab-btn { padding:8px 16px; border:1px solid #cbd5e1; border-radius:8px 8px 0 0; background:#f8fafc; color:#475569; font-size:14px; font-weight:600; cursor:pointer; position:relative; top:2px; border-bottom:none; }
+  .tab-btn:hover { background:#f1f5f9; }
+  .tab-btn.active { background:#fff; color:#2563eb; border-color:#2563eb #2563eb #fff; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+  .panel { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom:14px; }
+  .prev-box { background:#fffbeb; border:1px solid #fcd34d; border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+  .prev-head { font-size:14px; font-weight:700; color:#92400e; margin-bottom:0; display:flex; align-items:center; gap:10px; flex-wrap:wrap; cursor:pointer; user-select:none; }
+  .prev-head .muted { font-size:12px; color:#b45309; font-weight:400; }
+  .prev-arrow { margin-left:auto; font-size:12px; transition:transform .15s ease; color:#b45309; }
+  .prev-collapse { margin-top:10px; }
+  .prev-filters { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .prev-filters select { padding:5px 8px; border:1px solid #fcd34d; border-radius:6px; background:#fff; color:#78350f; font-size:12px; outline:none; }
+  .prev-filters select:focus { border-color:#f59e0b; box-shadow:0 0 0 2px rgba(245,158,11,.15); }
+  .prev-count { font-size:12px; color:#92400e; margin-left:auto; }
+  .prev-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:10px; }
+  .prev-section { background:#fff; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; }
+  .prev-section-title { font-size:12px; font-weight:700; color:#b45309; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+  .prev-row { display:flex; align-items:flex-start; gap:8px; font-size:12px; padding:6px 0; border-bottom:1px solid #fffbeb; line-height:1.5; }
+  .prev-row:last-child { border-bottom:none; }
+  .prev-date { font-weight:700; color:#92400e; min-width:58px; font-size:11px; padding-top:1px; }
+  .prev-time { font-weight:700; color:#b45309; min-width:66px; padding-top:1px; }
+  .prev-student { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .prev-name-line { display:flex; flex-wrap:wrap; align-items:center; gap:3px 6px; line-height:1.5; }
+  .prev-name-line b { font-size:12px; }
+  .prev-name-line .muted { font-size:11px; color:#64748b; }
+  .prev-meta-line { color:#64748b; font-size:11px; line-height:1.5; word-break:break-all; }
+  .prev-reason { display:inline-block; padding:1px 6px; border-radius:4px; background:#fef3c7; color:#92400e; font-size:11px; }
+  .prev-status { display:inline-block; padding:1px 6px; border-radius:4px; background:#fee2e2; color:#991b1b; font-size:11px; }
+  .panel-title { font-size:14px; font-weight:700; color:#334155; margin-bottom:10px; }
+  .chart-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:14px; margin-bottom:16px; }
+  .chart-panel { background:#f8fafc; border-radius:10px; padding:14px 16px; border:1px solid #e2e8f0; }
+  .chart-title { font-size:13px; font-weight:700; color:#334155; margin-bottom:10px; }
+  .chart-wrap { width:100%; height:220px; }
+  .chart-wrap svg { width:100%; height:100%; display:block; }
+  .chart-empty { display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-size:13px; }
+  .footer { text-align:center; color:#94a3b8; font-size:12px; margin-top:18px; }
+  .tbl-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  @media (max-width: 768px){
+    body { padding:10px; }
+    .container { max-width:100%; }
+    h1 { font-size:18px; }
+    .sub { font-size:12px; }
+    .toolbar, .datebar, .filters { gap:8px; }
+    .cards { gap:8px; margin-bottom:12px; }
+    .card { flex:1 1 42%; min-width:0; padding:10px 12px; }
+    .card .num { font-size:22px; }
+    .filters select, .filters input { flex:1 1 45%; min-width:0; }
+    .tab-nav { gap:4px; }
+    .tab-btn { flex:1 1 auto; padding:8px 6px; font-size:12px; text-align:center; }
+    /* 移动端日期条改为下拉 */
+    .datebar .db-links { display:none; }
+    .db-select { display:inline-block; }
+    /* 移动端表格转卡片竖排，免横滑 */
+    .tbl-scroll { overflow-x:visible; }
+    .tbl-scroll thead { display:none; }
+    .tbl-scroll table, .tbl-scroll tbody, .tbl-scroll tr, .tbl-scroll td { display:block; width:100%; box-sizing:border-box; }
+    .tbl-scroll tr { border:1px solid #e2e8f0; border-radius:8px; margin-bottom:8px; padding:4px 0; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+    .tbl-scroll tr.soon { background:#fffbeb; }
+    .tbl-scroll tr.row-late { background:#fff1f2; }
+    .tbl-scroll td { border:none; border-bottom:1px solid #f1f5f9; padding:6px 10px 6px 92px; position:relative; text-align:left; }
+    .tbl-scroll td:last-child { border-bottom:none; }
+    .tbl-scroll td:before { content:attr(data-label); position:absolute; left:10px; top:6px; width:80px; font-size:12px; font-weight:600; color:#64748b; }
+    .timeline, .panel { padding:12px; }
+    .sched-head { font-size:13px; }
+    .chart-grid { grid-template-columns:1fr; }
+    .chart-wrap { height:200px; }
+  }
+  @media (max-width: 480px){
+    .card { flex:1 1 100%; }
+    .filters select, .filters input { flex:1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="datebar"><span class="db-lbl">切换日期：</span><span class="db-links"><a class="db-btn" data-d="2026-07-25" href="上课提醒看板_2026-07-25.html">2026-07-25（周六）</a><a class="db-btn" data-d="2026-07-26" href="上课提醒看板_2026-07-26.html">2026-07-26（周日）</a><a class="db-btn" data-d="2026-07-27" href="上课提醒看板_2026-07-27.html">2026-07-27（周一）</a><a class="db-btn" data-d="2026-07-28" href="上课提醒看板_2026-07-28.html">2026-07-28（周二）</a><a class="db-btn" data-d="2026-07-29" href="上课提醒看板_2026-07-29.html">2026-07-29（周三）</a><a class="db-btn" data-d="2026-07-30" href="上课提醒看板_2026-07-30.html">2026-07-30（周四）</a><a class="db-btn" data-d="2026-07-31" href="上课提醒看板_2026-07-31.html">2026-07-31（周五）</a><a class="db-btn" data-d="2026-08-01" href="上课提醒看板_2026-08-01.html">2026-08-01（周六）</a><a class="db-btn" data-d="2026-08-02" href="上课提醒看板_2026-08-02.html">2026-08-02（周日）</a><a class="db-btn" data-d="2026-08-03" href="上课提醒看板_2026-08-03.html">2026-08-03（周一）</a><a class="db-btn" data-d="2026-08-04" href="上课提醒看板_2026-08-04.html">2026-08-04（周二）</a><a class="db-btn" data-d="2026-08-05" href="上课提醒看板_2026-08-05.html">2026-08-05（周三）</a><a class="db-btn" data-d="2026-08-06" href="上课提醒看板_2026-08-06.html">2026-08-06（周四）</a><a class="db-btn" data-d="2026-08-07" href="上课提醒看板_2026-08-07.html">2026-08-07（周五）</a><a class="db-btn" data-d="2026-08-08" href="上课提醒看板_2026-08-08.html">2026-08-08（周六）</a><a class="db-btn" data-d="2026-08-09" href="上课提醒看板_2026-08-09.html">2026-08-09（周日）</a><a class="db-btn" data-d="2026-08-10" href="上课提醒看板_2026-08-10.html">2026-08-10（周一）</a><a class="db-btn" data-d="2026-08-11" href="上课提醒看板_2026-08-11.html">2026-08-11（周二）</a><a class="db-btn" data-d="2026-08-12" href="上课提醒看板_2026-08-12.html">2026-08-12（周三）</a><a class="db-btn" data-d="2026-08-13" href="上课提醒看板_2026-08-13.html">2026-08-13（周四）</a><a class="db-btn" data-d="2026-08-14" href="上课提醒看板_2026-08-14.html">2026-08-14（周五）</a><a class="db-btn" data-d="2026-08-15" href="上课提醒看板_2026-08-15.html">2026-08-15（周六）</a><a class="db-btn" data-d="2026-08-16" href="上课提醒看板_2026-08-16.html">2026-08-16（周日）</a><a class="db-btn active" data-d="2026-08-17" href="#">2026-08-17（周一）</a></span><select class="db-select" id="dbSelect"><option value="2026-07-25">2026-07-25（周六）</option><option value="2026-07-26">2026-07-26（周日）</option><option value="2026-07-27">2026-07-27（周一）</option><option value="2026-07-28">2026-07-28（周二）</option><option value="2026-07-29">2026-07-29（周三）</option><option value="2026-07-30">2026-07-30（周四）</option><option value="2026-07-31">2026-07-31（周五）</option><option value="2026-08-01">2026-08-01（周六）</option><option value="2026-08-02">2026-08-02（周日）</option><option value="2026-08-03">2026-08-03（周一）</option><option value="2026-08-04">2026-08-04（周二）</option><option value="2026-08-05">2026-08-05（周三）</option><option value="2026-08-06">2026-08-06（周四）</option><option value="2026-08-07">2026-08-07（周五）</option><option value="2026-08-08">2026-08-08（周六）</option><option value="2026-08-09">2026-08-09（周日）</option><option value="2026-08-10">2026-08-10（周一）</option><option value="2026-08-11">2026-08-11（周二）</option><option value="2026-08-12">2026-08-12（周三）</option><option value="2026-08-13">2026-08-13（周四）</option><option value="2026-08-14">2026-08-14（周五）</option><option value="2026-08-15">2026-08-15（周六）</option><option value="2026-08-16">2026-08-16（周日）</option><option value="2026-08-17" selected>2026-08-17（周一）</option></select></div>
+  <div class="toolbar">
+    <button id="btnRefresh" onclick="refreshData()">🔄 刷新当天数据</button>
+    <span class="chip" id="chipAuto">⏰ 整点自动刷新</span>
+    <span class="refresh-msg" id="refreshMsg"></span>
+  </div>
+  <h1>📚 班主任当日上课提醒看板 <span id="dateTag"></span></h1>
+  <div class="sub">数据生成时间：2026-08-04 08:05:55 ｜ 双击表格行可复制豌豆ID</div>
+
+  <div class="prev-box" id="prevFollowBox" style="display:none">
+    <div class="prev-head" onclick="togglePrevFollow()" title="点击展开/收起">
+      📌 前日需跟进（<span id="prevDate"></span>）
+      <span class="muted">请假未补课 / 迟到未到课学员明细，次日由 LP 跟进</span>
+      <span class="prev-arrow" id="prevArrow">▶</span>
+    </div>
+    <div class="prev-collapse" id="prevCollapse" style="display:none">
+      <div class="prev-filters" id="prevFilters">
+        <select id="prevFilterLp"><option value="">全部 LP</option></select>
+        <select id="prevFilterTime"><option value="">全部时段</option><option value="am">上午 00:00-11:59</option><option value="pm">下午 12:00-17:59</option><option value="eve">晚上 18:00-23:59</option></select>
+        <span class="prev-count" id="prevCount"></span>
+      </div>
+      <div id="prevBody"></div>
+    </div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="tabClasses" onclick="switchTab('tabClasses')">📅 当日上课学员</button>
+    <button class="tab-btn" data-tab="tabSuspend" onclick="switchTab('tabSuspend')">⏸️ 停课学员（<span id="tabSusCnt">0</span>）</button>
+    <button class="tab-btn" data-tab="tabLate" onclick="switchTab('tabLate')">⏰ 今日迟到未到课（<span id="tabLateCnt">0</span>）</button>
+    <button class="tab-btn" data-tab="tabGraduated" onclick="switchTab('tabGraduated')">🎓 结业学员</button>
+  </div>
+
+  <div id="tabClasses" class="tab-content active">
+    <div class="cards" id="cards"></div>
+    <div class="timeline">
+      <div class="tl-title">⏰ 各时段上课人数（点击柱子筛选该时段）</div>
+      <div class="tl-bars" id="tlBars"></div>
+    </div>
+    <div class="sched-box" id="schedBox" style="display:none"></div>
+    <div class="abn-box" id="abnBox" style="display:none"></div>
+
+    <div class="filters">
+      <select id="fGroup" autocomplete="off"><option value="">全部组</option></select>
+      <select id="fLp" autocomplete="off"><option value="">全部LP</option></select>
+      <select id="fStatus" autocomplete="off"><option value="">全部状态</option></select>
+      <select id="fLang" autocomplete="off"><option value="">全部语种</option></select>
+      <select id="fHour" autocomplete="off"><option value="">全部时段</option></select>
+      <input type="text" id="fKw" placeholder="搜索 学员/豌豆ID/主讲老师">
+      <span class="chip" id="chipUpcoming">只看未开课</span>
+      <span class="chip" id="chipAbn">只看请假/补课</span>
+      <span class="chip" id="chipHighFreq">高频请假</span>
+      <span class="chip" id="chipClear">清除筛选</span>
+    </div>
+
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr>
+        <th>上课时间</th><th>状态</th><th>学员</th><th>豌豆ID</th><th>所属LP</th>
+        <th>级别</th><th>语种</th><th>主讲老师</th><th>课程</th><th>组</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    </div>
+    <div class="footer">共 <span id="cnt"></span> 条 · 由 class-reminder 工具生成</div>
+  </div>
+
+  <div id="tabSuspend" class="tab-content">
+    <div class="panel">
+      <div class="panel-title">⏸️ 当前停课学员（筛选后 <span id="susCnt">0</span> 人 / 全部 <span id="susTotal">0</span> 人）— 停课期间无需提醒上课</div>
+      <div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="fSusLp"><option value="">全部LP</option></select>
+        <select id="fSusRange">
+          <option value="">全部时间</option>
+          <option value="30">近 30 天停课</option>
+          <option value="90">近 90 天停课</option>
+          <option value="120">近 120 天停课</option>
+        </select>
+        <span style="font-size:12px;color:#64748b">按 LP / 停课时间范围筛选</span>
+        <span id="susStats" style="font-size:12px;color:#334155;font-weight:600;margin-left:auto"></span>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-panel">
+          <div class="chart-title">📈 停课 / 预计复课趋势（按月份）</div>
+          <div id="trendChart" class="chart-wrap"></div>
+        </div>
+        <div class="chart-panel">
+          <div class="chart-title">📊 停课原因分布（Top 10）</div>
+          <div id="reasonChart" class="chart-wrap"></div>
+        </div>
+      </div>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>学员</th><th>豌豆ID</th><th>所属LP</th><th>课程/级别</th><th>停课老师</th><th>上课周期<span class="hint" title="原固定上课时间，停课期间不排课">i</span></th><th>停课时间</th><th>已停天数</th><th>剩余天数</th><th>最后操作时间</th><th>停课原因</th><th style="min-width:220px">唤醒建议</th></tr></thead>
+        <tbody id="susBody"></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="tabGraduated" class="tab-content">
+    <div class="panel">
+      <div class="panel-title">🎓 结业学员（接口暂不可达）</div>
+      <p style="font-size:13px;color:#64748b;line-height:1.7">
+        当前账号（15840663958）的 CLP 网关<strong>未注册</strong>「结课学员列表」接口（菜单路由 <code>user/zero_hours</code> 调用返回 40401004），
+        且「全部学员」接口 <code>getAllStudentList</code> 仅返回<strong>在读（执行中）</strong>学员、不透出已结业（已结班 / 服务结束）学员，
+        因此暂无法直接抓取结业学员。<br>
+        如需补充，可改用具备「结课学员列表」权限的主管账号重新抓取，或在 61info / CLP 其他报表中导出结业名单后由本工具解析展示。
+      </p>
+    </div>
+  </div>
+
+  <div id="tabLate" class="tab-content">
+    <div class="panel">
+      <div class="panel-title">⏰ 迟到 / 旷课看板（开课 3 分钟未到已私信班主任；整节课未到且未请假 → 旷课，不单独推送）</div>
+      <div class="cards" id="lateCards"></div>
+
+      <h3 style="font-size:15px;font-weight:700;color:#b91c1c;margin:14px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🔴 进行中迟到（开课 3 分钟仍未进教室 · 已私信班主任提醒）
+        <select id="fLateLp" style="padding:4px 8px;border:1px solid #fecaca;border-radius:6px;background:#fff;color:#b91c1c;font-size:12px;font-weight:600"><option value="">全部班主任</option></select>
+      </h3>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>班主任</th><th>学员</th><th>豌豆ID</th><th>上课时间</th><th>已开</th><th>主讲老师</th><th>课程</th><th>状态</th></tr></thead>
+        <tbody id="lateBody"></tbody>
+      </table>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:700;color:#334155;margin:18px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">⚫ 今日旷课（整节课结束仍未进教室 · 未请假 · 不单独推送）
+        <select id="fAbsentLp" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#334155;font-size:12px;font-weight:600"><option value="">全部班主任</option></select>
+      </h3>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>班主任</th><th>学员</th><th>豌豆ID</th><th>上课时间</th><th>已开</th><th>主讲老师</th><th>课程</th><th>状态</th></tr></thead>
+        <tbody id="absentBody"></tbody>
+      </table>
+      </div>
+
+      <div class="hist-toggle" onclick="toggleLateHist()">▾ 今日历史（迟到后来进教室上课，<span id="lateHistCnt">0</span>）
+        <select id="fHistLp" onclick="event.stopPropagation()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#64748b;font-size:12px;font-weight:600"><option value="">全部班主任</option></select>
+      </div>
+      <div class="tbl-scroll" id="lateHistWrap" style="display:none">
+      <table>
+        <thead><tr><th>班主任</th><th>学员</th><th>豌豆ID</th><th>上课时间</th><th>已开</th><th>主讲老师</th><th>课程</th><th>状态</th></tr></thead>
+        <tbody id="lateHistoryBody"></tbody>
+      </table>
+      </div>
+      <div class="footer">最近巡检：<span id="lateGenAt">-</span> ｜ 守护状态：<span id="daemonHealth">-</span> ｜ 迟到命中即私信班主任 ｜ 旷课仅在看板展示、不单独推送 ｜ 每分钟按课表动态巡检</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"lp": "李欣旭", "group": "美澳5组", "student": "Cami", "wandou_id": "25097812", "big_user_id": "15328205", "time": "07:00", "end_time": "07:40", "level": "S6", "lang": "英语", "teacher": "Jonery老师（菲教02老师）", "course_name": "S6_7 蓝帽子上校", "status": "取消", "live_id": 17468969, "reason": "", "leave_remain": 10, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 2, "total": 3, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Zackery", "wandou_id": "28063583", "big_user_id": "19351015", "time": "07:00", "end_time": "07:40", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17474071, "reason": "", "leave_remain": 37, "suspend_remain": 6, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Emma", "wandou_id": "28452983", "big_user_id": "19924463", "time": "07:00", "end_time": "07:40", "level": "S4", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17477724, "reason": "", "leave_remain": 10, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 3, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Theo", "wandou_id": "28646232", "big_user_id": "20198105", "time": "07:00", "end_time": "07:40", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17474071, "reason": "", "leave_remain": 20, "suspend_remain": 4}, {"lp": "高庆兰", "group": "美澳5组", "student": "柔柔@", "wandou_id": "27388583", "big_user_id": "18411285", "time": "07:00", "end_time": "07:40", "level": "S4", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17477724, "reason": "", "leave_remain": 18, "suspend_remain": 3}, {"lp": "高庆兰", "group": "美澳5组", "student": "Alex", "wandou_id": "27963171", "big_user_id": "19207822", "time": "07:00", "end_time": "07:40", "level": "S6", "lang": "英语", "teacher": "Debbie老师（柯秋芬）", "course_name": "S6_8 决战黑侠客", "status": "正常", "live_id": 17468583, "reason": "", "leave_remain": 2, "suspend_remain": 1, "leave": {"this_month": 1, "last30": 4, "total": 6, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Camille", "wandou_id": "28197751", "big_user_id": "19569084", "time": "07:00", "end_time": "07:40", "level": "S4", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17477724, "reason": "", "leave_remain": 5, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Grace ", "wandou_id": "28545886", "big_user_id": "20043482", "time": "07:00", "end_time": "07:40", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17474071, "reason": "", "leave_remain": 29, "suspend_remain": 4}, {"lp": "高庆兰", "group": "美澳5组", "student": "悦悦", "wandou_id": "28546329", "big_user_id": "20044302", "time": "07:00", "end_time": "07:40", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17474071, "reason": "", "leave_remain": 13, "suspend_remain": 4, "leave": {"this_month": 1, "last30": 1, "total": 3, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Francis", "wandou_id": "28553568", "big_user_id": "20053983", "time": "07:00", "end_time": "07:40", "level": "S7", "lang": "英语", "teacher": "大辉猫老师（刘辉）", "course_name": "S7_6 过关斩将", "status": "正常", "live_id": 17470049, "reason": "", "leave_remain": 3, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Anna", "wandou_id": "28683072", "big_user_id": "20284352", "time": "07:00", "end_time": "07:40", "level": "S4", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17477724, "reason": "", "leave_remain": 13, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Zoe", "wandou_id": "26898253", "big_user_id": "17624616", "time": "08:00", "end_time": "08:40", "level": "S4", "lang": "英语", "teacher": "Myreen老师（外教07）", "course_name": "S4_15 神秘的小偷", "status": "正常", "live_id": 17487155, "reason": "", "leave_remain": 10, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "姐姐Vivian", "wandou_id": "28655349", "big_user_id": "20219017", "time": "08:00", "end_time": "08:40", "level": "S5", "lang": "英语", "teacher": "Ivy01（Ivy）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17477216, "reason": "", "leave_remain": 11, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Kevin", "wandou_id": "28674861", "big_user_id": "20268798", "time": "08:00", "end_time": "08:40", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_12 精彩的运动会", "status": "正常", "live_id": 17474405, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "Rhea", "wandou_id": "28706459", "big_user_id": "20327040", "time": "08:00", "end_time": "08:40", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_13 神厨小精灵", "status": "正常", "live_id": 17487236, "reason": "", "leave_remain": 11, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 2, "total": 2, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "娜娜", "wandou_id": "26877460", "big_user_id": "17588628", "time": "08:00", "end_time": "08:40", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_9 误入数字王国", "status": "正常", "live_id": 17473528, "reason": "", "leave_remain": 10, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "弟弟Lucas", "wandou_id": "27873189", "big_user_id": "19079106", "time": "08:00", "end_time": "08:40", "level": "S5", "lang": "英语", "teacher": "Ivy01（Ivy）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17477216, "reason": "", "leave_remain": 15, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "Ava", "wandou_id": "27970086", "big_user_id": "19217694", "time": "08:00", "end_time": "08:40", "level": "S4", "lang": "英语", "teacher": "Myreen老师（外教07）", "course_name": "S4_15 神秘的小偷", "status": "正常", "live_id": 17487155, "reason": "", "leave_remain": 12, "suspend_remain": 4}, {"lp": "高庆兰", "group": "美澳5组", "student": "Liya Chen", "wandou_id": "28249029", "big_user_id": "19649941", "time": "08:00", "end_time": "08:40", "level": "S4", "lang": "英语", "teacher": "Myreen老师（外教07）", "course_name": "S4_15 神秘的小偷", "status": "正常", "live_id": 17487155, "reason": "", "leave_remain": 19, "suspend_remain": 3}, {"lp": "高庆兰", "group": "美澳5组", "student": "Landan", "wandou_id": "28276955", "big_user_id": "19697017", "time": "08:00", "end_time": "08:40", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_12 精彩的运动会", "status": "正常", "live_id": 17474405, "reason": "", "leave_remain": 6, "suspend_remain": 0, "leave": {"this_month": 0, "last30": 2, "total": 4, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "闹闹 ", "wandou_id": "28591678", "big_user_id": "20113362", "time": "08:00", "end_time": "08:40", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_12 精彩的运动会", "status": "正常", "live_id": 17474405, "reason": "", "leave_remain": 7, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Ethan", "wandou_id": "28633402", "big_user_id": "20171547", "time": "08:00", "end_time": "08:40", "level": "S3", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S3_10 大力士举举", "status": "正常", "live_id": 17478568, "reason": "", "leave_remain": 8, "suspend_remain": 1, "leave": {"this_month": 1, "last30": 1, "total": 1, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Evan", "wandou_id": "28639458", "big_user_id": "20182890", "time": "08:00", "end_time": "08:40", "level": "S5", "lang": "英语", "teacher": "Ivy01（Ivy）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17477216, "reason": "", "leave_remain": 8, "suspend_remain": 1, "leave": {"this_month": 1, "last30": 1, "total": 1, "remain": 3}}, {"lp": "李欣旭", "group": "美澳5组", "student": "波妞", "wandou_id": "28675705", "big_user_id": "20270806", "time": "09:00", "end_time": "09:40", "level": "S3", "lang": "英语", "teacher": "Esme（Esme）", "course_name": "S3_8 树爷爷的烦恼", "status": "正常", "live_id": 17470379, "reason": "", "leave_remain": 6, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 1, "total": 3, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Nolan", "wandou_id": "27840312", "big_user_id": "19028663", "time": "09:00", "end_time": "09:40", "level": "S3", "lang": "英语", "teacher": "Esme（Esme）", "course_name": "S3_8 树爷爷的烦恼", "status": "正常", "live_id": 17470379, "reason": "", "leave_remain": 13, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 3, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "梓昕", "wandou_id": "28268233", "big_user_id": "19682808", "time": "09:00", "end_time": "09:40", "level": "S5", "lang": "英语", "teacher": "Peppa老师（邓定定）", "course_name": "S5_11 调皮的红彤彤", "status": "正常", "live_id": 17474345, "reason": "", "leave_remain": 39, "suspend_remain": 6}, {"lp": "高庆兰", "group": "美澳5组", "student": "Nicholas", "wandou_id": "28652933", "big_user_id": "20214627", "time": "09:00", "end_time": "09:40", "level": "S3", "lang": "英语", "teacher": "Esme（Esme）", "course_name": "S3_8 树爷爷的烦恼", "status": "正常", "live_id": 17470379, "reason": "", "leave_remain": 22, "suspend_remain": 4}, {"lp": "李欣旭", "group": "美澳5组", "student": "Grace", "wandou_id": "28232815", "big_user_id": "19623768", "time": "10:00", "end_time": "10:40", "level": "S6", "lang": "英语", "teacher": "Peanut老师（刘亦覃）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17456615, "reason": "", "leave_remain": 15, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "Andrew", "wandou_id": "28310719", "big_user_id": "19740362", "time": "10:00", "end_time": "10:40", "level": "S6", "lang": "英语", "teacher": "Peanut老师（刘亦覃）", "course_name": "S6_9 农场日记", "status": "取消", "live_id": 17456615, "reason": "", "leave_remain": 30, "suspend_remain": 3}, {"lp": "李欣旭", "group": "美澳5组", "student": "Emily", "wandou_id": "28476611", "big_user_id": "19953011", "time": "10:00", "end_time": "10:40", "level": "S3", "lang": "英语", "teacher": "Esme（Esme）", "course_name": "S3_10 大力士举举", "status": "正常", "live_id": 17474112, "reason": "", "leave_remain": 0, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 9, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Vito", "wandou_id": "28309133", "big_user_id": "19737666", "time": "10:00", "end_time": "10:40", "level": "S6", "lang": "英语", "teacher": "Peanut老师（刘亦覃）", "course_name": "S6_9 农场日记", "status": "取消", "live_id": 17456615, "reason": "", "leave_remain": 30, "suspend_remain": 4}, {"lp": "高庆兰", "group": "美澳5组", "student": "Sophia", "wandou_id": "28314272", "big_user_id": "19745225", "time": "10:00", "end_time": "10:40", "level": "S6", "lang": "英语", "teacher": "Peanut老师（刘亦覃）", "course_name": "S6_9 农场日记", "status": "取消", "live_id": 17456615, "reason": "", "leave_remain": 23, "suspend_remain": 4}, {"lp": "李欣旭", "group": "美澳5组", "student": "Miles", "wandou_id": "27741034", "big_user_id": "18892848", "time": "11:00", "end_time": "11:40", "level": "S4", "lang": "英语", "teacher": "Kay（Kay）", "course_name": "S4_13 初入魔法世界", "status": "正常", "live_id": 17465848, "reason": "", "leave_remain": 14, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Nora", "wandou_id": "28205642", "big_user_id": "19582371", "time": "11:00", "end_time": "11:40", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17413594, "reason": "", "leave_remain": 0, "suspend_remain": 1, "leave": {"this_month": 1, "last30": 2, "total": 3, "remain": 3}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Ella", "wandou_id": "28223507", "big_user_id": "19609260", "time": "11:00", "end_time": "11:40", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17413594, "reason": "", "leave_remain": 0, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "妞妞", "wandou_id": "28579552", "big_user_id": "20097074", "time": "11:00", "end_time": "11:40", "level": "S6", "lang": "英语", "teacher": "麵條老師（许淑怡）", "course_name": "S6_7 蓝帽子上校", "status": "取消", "live_id": 17474669, "reason": "", "leave_remain": 0, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 4, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Dorothy", "wandou_id": "28672667", "big_user_id": "20261293", "time": "11:00", "end_time": "11:40", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_9 应聘小管家", "status": "正常", "live_id": 17474543, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Téa", "wandou_id": "28218140", "big_user_id": "19601350", "time": "11:00", "end_time": "11:40", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17413594, "reason": "", "leave_remain": 2, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Ellie", "wandou_id": "28223505", "big_user_id": "19609198", "time": "11:00", "end_time": "11:40", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17413594, "reason": "", "leave_remain": 0, "suspend_remain": 0, "leave": {"this_month": 0, "last30": 3, "total": 8, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Kira", "wandou_id": "28642995", "big_user_id": "20190599", "time": "11:00", "end_time": "11:40", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_9 应聘小管家", "status": "正常", "live_id": 17474543, "reason": "", "leave_remain": 2, "suspend_remain": 1, "leave": {"this_month": 1, "last30": 1, "total": 2, "remain": 3}}, {"lp": "李欣旭", "group": "美澳5组", "student": "昕霏 ", "wandou_id": "26491564", "big_user_id": "17026844", "time": "14:00", "end_time": "14:40", "level": "S6", "lang": "英语", "teacher": "MilkBean老师（陈丽帆）", "course_name": "S6_6 爱拼才会赢", "status": "正常", "live_id": 17477737, "reason": "", "leave_remain": 15, "suspend_remain": 4, "leave": {"this_month": 1, "last30": 1, "total": 1, "remain": 3}}, {"lp": "李欣旭", "group": "美澳5组", "student": "jovy", "wandou_id": "28420403", "big_user_id": "19874434", "time": "14:00", "end_time": "14:40", "level": "S4", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17474222, "reason": "", "leave_remain": 10, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "Atlas", "wandou_id": "28585651", "big_user_id": "20104560", "time": "14:00", "end_time": "14:40", "level": "S4", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17474222, "reason": "", "leave_remain": 25, "suspend_remain": 5}, {"lp": "李欣旭", "group": "美澳5组", "student": "ella", "wandou_id": "28720443", "big_user_id": "20352210", "time": "14:00", "end_time": "14:40", "level": "S3", "lang": "英语", "teacher": "Esme（Esme）", "course_name": "S3_7 神庙历险记", "status": "取消", "live_id": 17487547, "reason": "", "leave_remain": 13, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "ella", "wandou_id": "28720443", "big_user_id": "20352210", "time": "14:00", "end_time": "14:40", "level": "S3", "lang": "英语", "teacher": "Alyssa老师（王林立）", "course_name": "S3_7 神庙历险记", "status": "正常", "live_id": 17474088, "reason": "", "leave_remain": 13, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "王蜜桃", "wandou_id": "27676871", "big_user_id": "18799246", "time": "14:00", "end_time": "14:40", "level": "S4", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17474222, "reason": "", "leave_remain": 8, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "Henry", "wandou_id": "28599025", "big_user_id": "20122720", "time": "14:00", "end_time": "14:40", "level": "S4", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S4_8 寻找修复宝石", "status": "正常", "live_id": 17474222, "reason": "", "leave_remain": 17, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "丞", "wandou_id": "28193096", "big_user_id": "19563359", "time": "15:00", "end_time": "15:40", "level": "S4", "lang": "英语", "teacher": "Myreen老师（外教07）", "course_name": "S4_11 沼泽地冒险", "status": "正常", "live_id": 17487140, "reason": "", "leave_remain": 11, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Lincoln", "wandou_id": "28230725", "big_user_id": "19620249", "time": "15:00", "end_time": "15:40", "level": "S4", "lang": "英语", "teacher": "Myreen老师（外教07）", "course_name": "S4_11 沼泽地冒险", "status": "正常", "live_id": 17487140, "reason": "", "leave_remain": 18, "suspend_remain": 5, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Cecille", "wandou_id": "28670626", "big_user_id": "20253407", "time": "15:00", "end_time": "15:40", "level": "S4", "lang": "英语", "teacher": "Rachlin老师（Rachlin老师）", "course_name": "S4_9 误入数字王国", "status": "正常", "live_id": 17487976, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "Jacob", "wandou_id": "28675281", "big_user_id": "20269845", "time": "15:00", "end_time": "15:40", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_11 调皮的红彤彤", "status": "正常", "live_id": 17470275, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Charisse", "wandou_id": "28510800", "big_user_id": "19999764", "time": "15:00", "end_time": "15:40", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_11 调皮的红彤彤", "status": "正常", "live_id": 17470275, "reason": "", "leave_remain": 10, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "Alan", "wandou_id": "28703471", "big_user_id": "20321484", "time": "15:00", "end_time": "15:40", "level": "S4", "lang": "英语", "teacher": "Myreen老师（外教07）", "course_name": "S4_11 沼泽地冒险", "status": "正常", "live_id": 17487140, "reason": "", "leave_remain": 12, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Emily", "wandou_id": "26809382", "big_user_id": "17484473", "time": "16:00", "end_time": "16:40", "level": "S6", "lang": "英语", "teacher": "polly老师（贺萍）", "course_name": "S6_10 符号的智慧", "status": "正常", "live_id": 17485346, "reason": "", "leave_remain": 34, "suspend_remain": 4, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "张之浩", "wandou_id": "26960101", "big_user_id": "17726940", "time": "16:00", "end_time": "16:40", "level": "S7", "lang": "英语", "teacher": "婉婉老师（李君）", "course_name": "S7_6 过关斩将", "status": "正常", "live_id": 17467948, "reason": "", "leave_remain": 28, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "睿睿", "wandou_id": "26964899", "big_user_id": "17734083", "time": "16:00", "end_time": "16:40", "level": "S6", "lang": "英语", "teacher": "polly老师（贺萍）", "course_name": "S6_10 符号的智慧", "status": "正常", "live_id": 17485346, "reason": "", "leave_remain": 4, "suspend_remain": 3, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "lily", "wandou_id": "27022608", "big_user_id": "17826817", "time": "16:00", "end_time": "16:40", "level": "S6", "lang": "英语", "teacher": "查查老师（查焰晴）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17473770, "reason": "", "leave_remain": 0, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 1, "total": 4, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Keenan", "wandou_id": "28474639", "big_user_id": "19950242", "time": "16:00", "end_time": "16:40", "level": "S4", "lang": "英语", "teacher": "Daze（Daze）", "course_name": "S4_11 沼泽地冒险", "status": "正常", "live_id": 17470278, "reason": "", "leave_remain": 11, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "恩旭", "wandou_id": "28541094", "big_user_id": "20037231", "time": "16:00", "end_time": "16:40", "level": "S4", "lang": "英语", "teacher": "Daze（Daze）", "course_name": "S4_11 沼泽地冒险", "status": "正常", "live_id": 17470278, "reason": "", "leave_remain": 1, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Carson", "wandou_id": "28625149", "big_user_id": "20156987", "time": "16:00", "end_time": "16:40", "level": "S7", "lang": "英语", "teacher": "肥鸭老师（周傲雪）", "course_name": "S7_10 初遇布鲁特", "status": "正常", "live_id": 17473983, "reason": "", "leave_remain": 8, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Cindy", "wandou_id": "27865462", "big_user_id": "19067274", "time": "16:00", "end_time": "16:40", "level": "S6", "lang": "英语", "teacher": "查查老师（查焰晴）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17473770, "reason": "", "leave_remain": 8, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "luke", "wandou_id": "27314417", "big_user_id": "18293107", "time": "16:50", "end_time": "17:30", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17478151, "reason": "", "leave_remain": 1, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Nico", "wandou_id": "28198733", "big_user_id": "14113432", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17478223, "reason": "", "leave_remain": 4, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 4, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Lucas ", "wandou_id": "28345346", "big_user_id": "19784077", "time": "16:50", "end_time": "17:30", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17478151, "reason": "", "leave_remain": 12, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "Jasper", "wandou_id": "28436234", "big_user_id": "19901649", "time": "16:50", "end_time": "17:30", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17478151, "reason": "", "leave_remain": 23, "suspend_remain": 4}, {"lp": "李欣旭", "group": "美澳5组", "student": "Edward", "wandou_id": "28557150", "big_user_id": "20060376", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17478223, "reason": "", "leave_remain": 22, "suspend_remain": 4}, {"lp": "李欣旭", "group": "美澳5组", "student": "Charlie", "wandou_id": "28645436", "big_user_id": "20196257", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17478223, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "海闻", "wandou_id": "28673546", "big_user_id": "20265094", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Lydia老师（刘雨佳）", "course_name": "S5_11 调皮的红彤彤", "status": "正常", "live_id": 17468077, "reason": "", "leave_remain": 13, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "Rihanna", "wandou_id": "28108519", "big_user_id": "19424700", "time": "16:50", "end_time": "17:30", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17470408, "reason": "", "leave_remain": 10, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Caleb换令时需提醒", "wandou_id": "28488722", "big_user_id": "19968187", "time": "16:50", "end_time": "17:30", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_9 农场日记", "status": "正常", "live_id": 17478151, "reason": "", "leave_remain": 14, "suspend_remain": 3, "leave": {"this_month": 1, "last30": 1, "total": 3, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "瑞明", "wandou_id": "28489414", "big_user_id": "19969341", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S5_7 我们的元宵节", "status": "正常", "live_id": 17470082, "reason": "", "leave_remain": 27, "suspend_remain": 5}, {"lp": "高庆兰", "group": "美澳5组", "student": "Ella", "wandou_id": "28537275", "big_user_id": "20032371", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17478223, "reason": "", "leave_remain": 21, "suspend_remain": 4}, {"lp": "高庆兰", "group": "美澳5组", "student": "Elijah", "wandou_id": "28658743", "big_user_id": "20227826", "time": "16:50", "end_time": "17:30", "level": "S5", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S5_7 我们的元宵节", "status": "正常", "live_id": 17470082, "reason": "", "leave_remain": 5, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Mia Lin", "wandou_id": "28680926", "big_user_id": "20280968", "time": "16:50", "end_time": "17:30", "level": "S3", "lang": "", "teacher": "小音老师（罗巧）", "course_name": "S3_7 神庙历险记", "status": "取消", "live_id": 17469705, "reason": "", "leave_remain": 7, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Zack King", "wandou_id": "27562745", "big_user_id": "18642772", "time": "17:40", "end_time": "18:20", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "正常", "live_id": 17469620, "reason": "", "leave_remain": 19, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "Olivia", "wandou_id": "27702146", "big_user_id": "18836200", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_13 神厨小精灵", "status": "正常", "live_id": 17470075, "reason": "", "leave_remain": 5, "suspend_remain": 0, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "小玉米", "wandou_id": "27832727", "big_user_id": "19019322", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_8 树爷爷的烦恼", "status": "正常", "live_id": 17474333, "reason": "", "leave_remain": 2, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 1, "total": 3, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Aden", "wandou_id": "28217127", "big_user_id": "19599934", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_13 神厨小精灵", "status": "正常", "live_id": 17470075, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "妹妹欣柠", "wandou_id": "28278027", "big_user_id": "19699473", "time": "17:40", "end_time": "18:20", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "正常", "live_id": 17469620, "reason": "", "leave_remain": 8, "suspend_remain": 0}, {"lp": "李欣旭", "group": "美澳5组", "student": "Reina ", "wandou_id": "28389444", "big_user_id": "19836498", "time": "17:40", "end_time": "18:20", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_8 决战黑侠客", "status": "正常", "live_id": 17473759, "reason": "", "leave_remain": 15, "suspend_remain": 3}, {"lp": "李欣旭", "group": "美澳5组", "student": "Calista", "wandou_id": "28631725", "big_user_id": "20168113", "time": "17:40", "end_time": "18:20", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "正常", "live_id": 17469620, "reason": "", "leave_remain": 4, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Adam Liu", "wandou_id": "28639128", "big_user_id": "20182513", "time": "17:40", "end_time": "18:20", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "正常", "live_id": 17469620, "reason": "", "leave_remain": 5, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "土土", "wandou_id": "28655710", "big_user_id": "20220096", "time": "17:40", "end_time": "18:20", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_7 雪花水晶球", "status": "正常", "live_id": 17470344, "reason": "", "leave_remain": 2, "suspend_remain": 0, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Aver ", "wandou_id": "28679293", "big_user_id": "20277431", "time": "17:40", "end_time": "18:20", "level": "S2", "lang": "英语", "teacher": "Fayki老师（付雅琪）", "course_name": "S2_8 别吃！糊涂果！", "status": "正常", "live_id": 17473827, "reason": "", "leave_remain": 5, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 3, "total": 5, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Alina", "wandou_id": "28044494", "big_user_id": "19325203", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_8 树爷爷的烦恼", "status": "正常", "live_id": 17474333, "reason": "", "leave_remain": 18, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Yoanne Yeo杨嫣", "wandou_id": "28313737", "big_user_id": "19744435", "time": "17:40", "end_time": "18:20", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_8 决战黑侠客", "status": "正常", "live_id": 17473759, "reason": "", "leave_remain": 1, "suspend_remain": 0}, {"lp": "高庆兰", "group": "美澳5组", "student": "Hayley ", "wandou_id": "28412225", "big_user_id": "19864858", "time": "17:40", "end_time": "18:20", "level": "S5", "lang": "英语", "teacher": "Show老师（周慧）", "course_name": "S5_8 生活中的括号图", "status": "正常", "live_id": 17477402, "reason": "", "leave_remain": 5, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 2, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Hayley ", "wandou_id": "28412225", "big_user_id": "19864858", "time": "17:40", "end_time": "18:20", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "取消", "live_id": 17469620, "reason": "", "leave_remain": 5, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 2, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "許智聰Bosco ", "wandou_id": "28491398", "big_user_id": "19973014", "time": "17:40", "end_time": "18:20", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_8 决战黑侠客", "status": "正常", "live_id": 17473759, "reason": "", "leave_remain": 4, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "zoey", "wandou_id": "28504166", "big_user_id": "19990391", "time": "17:40", "end_time": "18:20", "level": "S6", "lang": "英语", "teacher": "小潘潘老师（潘黎）", "course_name": "S6_8 决战黑侠客", "status": "正常", "live_id": 17473759, "reason": "", "leave_remain": 9, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "恩欣", "wandou_id": "28545994", "big_user_id": "20043822", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_8 树爷爷的烦恼", "status": "正常", "live_id": 17474333, "reason": "", "leave_remain": 16, "suspend_remain": 3, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Lok Lok", "wandou_id": "28617620", "big_user_id": "20144914", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_13 神厨小精灵", "status": "正常", "live_id": 17470075, "reason": "", "leave_remain": 25, "suspend_remain": 4}, {"lp": "高庆兰", "group": "美澳5组", "student": "Ethan", "wandou_id": "28637611", "big_user_id": "20179138", "time": "17:40", "end_time": "18:20", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_7 雪花水晶球", "status": "正常", "live_id": 17470344, "reason": "", "leave_remain": 24, "suspend_remain": 4, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Jireh", "wandou_id": "28647130", "big_user_id": "20200837", "time": "17:40", "end_time": "18:20", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_7 雪花水晶球", "status": "正常", "live_id": 17470344, "reason": "", "leave_remain": 15, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "Samuel", "wandou_id": "28714266", "big_user_id": "20340962", "time": "17:40", "end_time": "18:20", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_13 神厨小精灵", "status": "取消", "live_id": 17470075, "reason": "", "leave_remain": 5, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "靖恩", "wandou_id": "27594371", "big_user_id": "18688256", "time": "18:30", "end_time": "19:10", "level": "S6", "lang": "英语", "teacher": "Show老师（周慧）", "course_name": "S6_8 决战黑侠客", "status": "取消", "live_id": 17481849, "reason": "", "leave_remain": 0, "suspend_remain": 0, "leave": {"this_month": 0, "last30": 1, "total": 3, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "点点", "wandou_id": "25871271", "big_user_id": "16205065", "time": "18:30", "end_time": "19:10", "level": "S6", "lang": "", "teacher": "小莫老师（赵璐）", "course_name": "S6_11 蓝帽子上校", "status": "正常", "live_id": 17473282, "reason": "", "leave_remain": 0, "suspend_remain": null}, {"lp": "高庆兰", "group": "美澳5组", "student": "Julian", "wandou_id": "27035677", "big_user_id": "17846872", "time": "18:30", "end_time": "19:10", "level": "S4", "lang": "", "teacher": "帕妮妮老师（郑敏仪）", "course_name": "S4_7 解救地面城", "status": "正常", "live_id": 17473879, "reason": "", "leave_remain": 16, "suspend_remain": 3}, {"lp": "高庆兰", "group": "美澳5组", "student": "柚柚", "wandou_id": "27337241", "big_user_id": "18332067", "time": "18:30", "end_time": "19:10", "level": "S5", "lang": "英语", "teacher": "Ellie（Ellie）", "course_name": "S5_10 贪吃的黄橙橙", "status": "正常", "live_id": 17470001, "reason": "", "leave_remain": 14, "suspend_remain": 3, "leave": {"this_month": 1, "last30": 3, "total": 3, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Ziqi", "wandou_id": "28088253", "big_user_id": "19389573", "time": "18:30", "end_time": "19:10", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_14 甜饼圈大赛", "status": "正常", "live_id": 17474139, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Sophia", "wandou_id": "28166809", "big_user_id": "19521781", "time": "18:30", "end_time": "19:10", "level": "S4", "lang": "英语", "teacher": "Rachlin老师（Rachlin老师）", "course_name": "S4_6 寻找蜂蜜宝典", "status": "正常", "live_id": 17473670, "reason": "", "leave_remain": 26, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "思瑜", "wandou_id": "27858054", "big_user_id": "19055676", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_6 寻找蜂蜜宝典", "status": "正常", "live_id": 17473389, "reason": "", "leave_remain": 19, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "晨宇", "wandou_id": "27862985", "big_user_id": "19063647", "time": "19:20", "end_time": "20:00", "level": "S5", "lang": "英语", "teacher": "Ivy01（Ivy）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17469062, "reason": "", "leave_remain": 16, "suspend_remain": 3}, {"lp": "李欣旭", "group": "美澳5组", "student": "蔡宜橞", "wandou_id": "27878456", "big_user_id": "19085561", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_6 寻找蜂蜜宝典", "status": "正常", "live_id": 17473389, "reason": "", "leave_remain": 12, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "缤缤", "wandou_id": "28166934", "big_user_id": "19521953", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S4_10 寻找失落的数字宝石", "status": "正常", "live_id": 17473661, "reason": "", "leave_remain": 5, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Emily", "wandou_id": "28168107", "big_user_id": "19523725", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S4_14 麻烦的时空魔法", "status": "正常", "live_id": 17465466, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "宁宁", "wandou_id": "28195822", "big_user_id": "19567119", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_6 寻找蜂蜜宝典", "status": "正常", "live_id": 17473389, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "彬彬", "wandou_id": "28261906", "big_user_id": "19671933", "time": "19:20", "end_time": "20:00", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "正常", "live_id": 17469703, "reason": "", "leave_remain": 12, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Teddy", "wandou_id": "28330839", "big_user_id": "19766680", "time": "19:20", "end_time": "20:00", "level": "S5", "lang": "英语", "teacher": "Rovie老师（菲教01老师）", "course_name": "S5_12 默契大挑战", "status": "正常", "live_id": 17469703, "reason": "", "leave_remain": 17, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Brayden 精凯", "wandou_id": "28380663", "big_user_id": "19826357", "time": "19:20", "end_time": "20:00", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_6 雨林才艺大比拼", "status": "正常", "live_id": 17473092, "reason": "", "leave_remain": 19, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "西西", "wandou_id": "28488118", "big_user_id": "19967507", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S4_14 麻烦的时空魔法", "status": "正常", "live_id": 17465466, "reason": "", "leave_remain": 8, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 2, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "Anders", "wandou_id": "28549211", "big_user_id": "20048764", "time": "19:20", "end_time": "20:00", "level": "S5", "lang": "英语", "teacher": "Ivy01（Ivy）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17469062, "reason": "", "leave_remain": 6, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "Clara杜宣颖", "wandou_id": "28673995", "big_user_id": "20266623", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S4_6 寻找蜂蜜宝典", "status": "正常", "live_id": 17473389, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "Meghan", "wandou_id": "28690606", "big_user_id": "20299046", "time": "19:20", "end_time": "20:00", "level": "S3", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S3_9 运动健将", "status": "取消", "live_id": 17473869, "reason": "", "leave_remain": 10, "suspend_remain": 1, "leave": {"this_month": 2, "last30": 3, "total": 3, "remain": 2}}, {"lp": "李欣旭", "group": "美澳5组", "student": "王永恩", "wandou_id": "28731112", "big_user_id": "20373469", "time": "19:20", "end_time": "20:00", "level": "S3", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17473869, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "果果 Jasper", "wandou_id": "25891253", "big_user_id": "16229582", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Kay（Kay）", "course_name": "S4_10 寻找失落的数字宝石", "status": "正常", "live_id": 17478503, "reason": "", "leave_remain": 0, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 1, "total": 3, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "王晨曦", "wandou_id": "28053513", "big_user_id": "19335958", "time": "19:20", "end_time": "20:00", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_7 雪花水晶球", "status": "正常", "live_id": 17470342, "reason": "", "leave_remain": 2, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Lucas", "wandou_id": "28268810", "big_user_id": "19683804", "time": "19:20", "end_time": "20:00", "level": "S5", "lang": "英语", "teacher": "Eliza老师（Nicole）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17474022, "reason": "", "leave_remain": 19, "suspend_remain": 3}, {"lp": "高庆兰", "group": "美澳5组", "student": "靖元", "wandou_id": "28288546", "big_user_id": "19712818", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S4_14 麻烦的时空魔法", "status": "正常", "live_id": 17465466, "reason": "", "leave_remain": 17, "suspend_remain": 3}, {"lp": "高庆兰", "group": "美澳5组", "student": "Aiden", "wandou_id": "28382623", "big_user_id": "19828806", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S4_10 寻找失落的数字宝石", "status": "正常", "live_id": 17473661, "reason": "", "leave_remain": 3, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Elysha娜娜", "wandou_id": "28385227", "big_user_id": "19831940", "time": "19:20", "end_time": "20:00", "level": "S3", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S3_9 运动健将", "status": "正常", "live_id": 17473869, "reason": "", "leave_remain": 27, "suspend_remain": 5, "leave": {"this_month": 1, "last30": 2, "total": 2, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "kane", "wandou_id": "28494248", "big_user_id": "19977036", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S4_10 寻找失落的数字宝石", "status": "正常", "live_id": 17473661, "reason": "", "leave_remain": 0, "suspend_remain": 1, "leave": {"this_month": 1, "last30": 5, "total": 8, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "泰瑞", "wandou_id": "28577535", "big_user_id": "20094705", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S4_14 麻烦的时空魔法", "status": "正常", "live_id": 17465466, "reason": "", "leave_remain": 4, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "刘籽汐", "wandou_id": "28657580", "big_user_id": "20224244", "time": "19:20", "end_time": "20:00", "level": "S4", "lang": "英语", "teacher": "Jannie（Jannie）", "course_name": "S4_10 寻找失落的数字宝石", "status": "正常", "live_id": 17470316, "reason": "", "leave_remain": 11, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Lorraine蕊萱", "wandou_id": "28717628", "big_user_id": "20347199", "time": "19:20", "end_time": "20:00", "level": "S2", "lang": "英语", "teacher": "Ariana（Ariana）", "course_name": "S2_7 雪花水晶球", "status": "正常", "live_id": 17470342, "reason": "", "leave_remain": 5, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "翊晞", "wandou_id": "28034047", "big_user_id": "19308871", "time": "20:10", "end_time": "20:50", "level": "S5", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17473459, "reason": "", "leave_remain": 0, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "柏霖", "wandou_id": "28046062", "big_user_id": "19327731", "time": "20:10", "end_time": "20:50", "level": "S5", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S5_9 出发！冒险家", "status": "正常", "live_id": 17473459, "reason": "", "leave_remain": 4, "suspend_remain": 0}, {"lp": "李欣旭", "group": "美澳5组", "student": "晨晨", "wandou_id": "28232652", "big_user_id": "19623398", "time": "20:10", "end_time": "20:50", "level": "S5", "lang": "英语", "teacher": "Eliza老师（Nicole）", "course_name": "S5_8 生活中的括号图", "status": "正常", "live_id": 17464798, "reason": "", "leave_remain": 5, "suspend_remain": 2}, {"lp": "李欣旭", "group": "美澳5组", "student": "崇凯【电话勿扰】", "wandou_id": "28530269", "big_user_id": "20023645", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Shine老师（菲教03老师）", "course_name": "S3_12 精彩的运动会", "status": "正常", "live_id": 17474138, "reason": "", "leave_remain": 0, "suspend_remain": 0, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "李欣旭", "group": "美澳5组", "student": "政廷", "wandou_id": "28612806", "big_user_id": "20138902", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_10 大力士举举", "status": "正常", "live_id": 17474447, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "小新", "wandou_id": "28634598", "big_user_id": "20173778", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_11 果园里的跳跳", "status": "正常", "live_id": 17477840, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "Emir", "wandou_id": "28635820", "big_user_id": "20175659", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Selene（Selene）", "course_name": "S3_13 神厨小精灵", "status": "正常", "live_id": 17470398, "reason": "", "leave_remain": 5, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Nash tan", "wandou_id": "26592175", "big_user_id": "17170804", "time": "20:10", "end_time": "20:50", "level": "S6", "lang": "英语", "teacher": "Celina老师（武子会）", "course_name": "S6_10 符号的智慧", "status": "正常", "live_id": 17478529, "reason": "", "leave_remain": 1, "suspend_remain": 1, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Jojo&Momo", "wandou_id": "27786948", "big_user_id": "18950956", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_10 大力士举举", "status": "取消", "live_id": 17474447, "reason": "", "leave_remain": 0, "suspend_remain": null, "leave": {"this_month": 0, "last30": 0, "total": 3, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Abigail", "wandou_id": "28036470", "big_user_id": "19311872", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Irish老师（Irish老师）", "course_name": "S3_11 果园里的跳跳", "status": "正常", "live_id": 17477840, "reason": "", "leave_remain": 5, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 0, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Cyrus", "wandou_id": "28632008", "big_user_id": "20168654", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_10 大力士举举", "status": "正常", "live_id": 17474447, "reason": "", "leave_remain": 12, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "瑾妍", "wandou_id": "28636469", "big_user_id": "20176927", "time": "20:10", "end_time": "20:50", "level": "S3", "lang": "英语", "teacher": "Precious（Precious）", "course_name": "S3_10 大力士举举", "status": "正常", "live_id": 17474447, "reason": "", "leave_remain": 20, "suspend_remain": 4, "leave": {"this_month": 1, "last30": 1, "total": 1, "remain": 3}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Wei Heng", "wandou_id": "28638944", "big_user_id": "20182171", "time": "20:10", "end_time": "20:50", "level": "S6", "lang": "英语", "teacher": "Celina老师（武子会）", "course_name": "S6_10 符号的智慧", "status": "正常", "live_id": 17478529, "reason": "", "leave_remain": 10, "suspend_remain": 2}, {"lp": "高庆兰", "group": "美澳5组", "student": "EJ", "wandou_id": "28648574", "big_user_id": "20205741", "time": "20:10", "end_time": "20:50", "level": "S2", "lang": "英语", "teacher": "Ivy01（Ivy）", "course_name": "S2_7 雪花水晶球", "status": "正常", "live_id": 17466390, "reason": "", "leave_remain": 12, "suspend_remain": 2, "leave": {"this_month": 0, "last30": 1, "total": 1, "remain": 4}}, {"lp": "高庆兰", "group": "美澳5组", "student": "Jerzelle可晴", "wandou_id": "28691086", "big_user_id": "20300033", "time": "20:10", "end_time": "20:40", "level": "S1", "lang": "英语", "teacher": "Davina老师（张慧）", "course_name": "S1_11 学说对不起", "status": "正常", "live_id": 17470429, "reason": "", "leave_remain": 6, "suspend_remain": 1}, {"lp": "李欣旭", "group": "美澳5组", "student": "Bowen Zheng", "wandou_id": "28713143", "big_user_id": "20338860", "time": "22:00", "end_time": "22:40", "level": "S5", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S5_8 生活中的括号图", "status": "正常", "live_id": 17473374, "reason": "", "leave_remain": 9, "suspend_remain": 1}, {"lp": "高庆兰", "group": "美澳5组", "student": "Lua", "wandou_id": "26766053", "big_user_id": "17420006", "time": "22:00", "end_time": "22:40", "level": "S5", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S5_8 生活中的括号图", "status": "正常", "live_id": 17473374, "reason": "", "leave_remain": 8, "suspend_remain": 3}, {"lp": "高庆兰", "group": "美澳5组", "student": "Yi Jie易杰", "wandou_id": "28494827", "big_user_id": "19978101", "time": "22:00", "end_time": "22:40", "level": "S5", "lang": "英语", "teacher": "Antheia（Antheia）", "course_name": "S5_8 生活中的括号图", "status": "正常", "live_id": 17473374, "reason": "", "leave_remain": 10, "suspend_remain": 2}];
+const LATE = {"date": "2026-08-17", "generated_at": "2026-08-04 08:05:55", "grace": 3, "count": 0, "total": 0, "last_patrol": "2026-08-04 08:05:55", "daemon_ok": true, "late": []};
+const PREV_FOLLOW = {"date": "2026-08-16", "leave": [], "late": []};
+// 实时数据源（私有数据仓库，浏览器带 token 拉 GitHub Contents API，前端 base64 解码）。
+// 为空时退化为同源 late_<date>.json / 内嵌快照（本地打开或团队仓库版均可用）。
+const LATE_API_BASE = "https://api.github.com/repos/xiangmengqing/class-reminder-live/contents";
+const LATE_API_TOKEN = "";
+// 将实时迟到状态叠加进主数据，使「当日上课学员」Tab 也能按真实状态高亮
+(function mergeLateIntoData(){
+  try {
+    if (LATE && Array.isArray(LATE.late)) {
+      LATE.late.forEach(function(z){
+        if (!z.wandou_id) return;
+        var st = (z.status === 'late') ? '迟到'
+               : (z.status === 'absent') ? '旷课'
+               : (z.status === 'entered' || z.status === 'final_absent') ? null  // 已处理完，不覆盖原课表状态
+               : null;
+        if (!st) return;
+        for (var i=0;i<DATA.length;i++){ if(DATA[i].wandou_id === z.wandou_id){ DATA[i].status = st; break; } }
+      });
+    }
+  } catch(e){}
+})();
+const STYLE = {"正常": ["#16a34a", "#dcfce7"], "已完成": ["#64748b", "#e2e8f0"], "请假": ["#dc2626", "#fee2e2"], "补课": ["#d97706", "#fef3c7"], "调课": ["#7c3aed", "#ede9fe"], "旷课": ["#be123c", "#ffe4e6"], "迟到": ["#dc2626", "#fee2e2"]};
+const LEAVE_CFG = {"quota": 4, "hf_month": 3, "hf_30": 4};
+const DATE = "2026-08-17";
+let SCHED_STATUS = '';
+let SCHED_TEACHER = '';
+let ABN_STATUS = '';
+document.getElementById('dateTag').textContent = DATE;
+// 是否由 serve.py 本地服务托管（有 /refetch 等后端接口）；静态托管（CloudStudio 等）为 false
+const isServe = location.pathname.indexOf('/view') >= 0;
+document.querySelectorAll('.datebar a[data-d]').forEach(a=>{
+  const d = a.getAttribute('data-d');
+  // 激活日期 href 已是 #，不覆盖
+  if(a.getAttribute('href') !== '#') a.href = isServe ? ('/view?date='+d) : ('上课提醒看板_'+d+'.html');
+});
+// 移动端日期下拉切换
+const dbSel = document.getElementById('dbSelect');
+if(dbSel){
+  dbSel.onchange = function(){
+    const d = this.value;
+    const url = isServe ? ('/view?date='+d) : ('上课提醒看板_'+d+'.html');
+    if(isServe){ location.href = url; return; }
+    // 静态托管：先 HEAD 校验目标文件是否存在，避免 404 白屏
+    fetch(url, {method:'HEAD'}).then(r=>{
+      if(r.ok) location.href = url;
+      else alert('该日期的看板尚未生成，无法切换');
+    }).catch(()=>{ location.href = url; });
+  };
+}
+// 静态托管：隐藏刷新 / 自动刷新，并把生成时间标为快照提示
+if(!isServe){
+  const bf = document.getElementById('btnRefresh'); if(bf) bf.style.display='none';
+  const ca = document.getElementById('chipAuto'); if(ca) ca.style.display='none';
+  const sub = document.getElementById('subLine');
+  if(sub){ const orig = sub.innerHTML; sub.innerHTML = '📌 <b>数据快照</b>：' + orig; sub.style.color = '#b45309'; }
+  else { const sl = document.getElementById('sub'); if(sl){ sl.innerHTML = '📌 <b>数据快照</b>：' + sl.innerHTML; sl.style.color = '#b45309'; } }
+}
+
+const $ = id => document.getElementById(id);
+const LANG_NORM = {'粤语':'粤语班','英语':'英语班','普通话':'普通话班','人教版':'普通话班','台湾':'普通话班','中英':'双语班'};
+function normLang(l){ l=l||''; if(!l) return '未标注'; return LANG_NORM[l]||l; }
+
+function uniq(arr){ return [...new Set(arr)].filter(Boolean).sort(); }
+function fillSel(id, vals){
+  const s=$(id);
+  const def = s.querySelector('option[value=""]') ? s.querySelector('option[value=""]').textContent : '';
+  s.innerHTML = def ? '<option value="">'+def+'</option>' : '';
+  vals.filter(Boolean).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o);});
+}
+// 先强制清空浏览器可能记忆的筛选值，再填充 option，避免打开页面时因记忆值导致表格空白
+['fGroup','fLp','fStatus','fLang','fHour'].forEach(id=>{ if($(id)) $(id).value=''; });
+fillSel('fGroup', uniq(DATA.map(d=>d.group)));
+fillSel('fLp', uniq(DATA.map(d=>d.lp)));
+fillSel('fStatus', uniq(DATA.map(d=>d.status||'正常')));
+fillSel('fLang', uniq(DATA.map(d=>normLang(d.lang))));
+(function(){
+  const sel=$('fHour');
+  sel.innerHTML = '<option value="">全部时段</option>'
+    + '<option value="am">上午 00:00-11:59</option>'
+    + '<option value="pm">下午 12:00-17:59</option>'
+    + '<option value="eve">晚上 18:00-23:59</option>';
+})();
+
+function nowHM(){ const n=new Date(); return String(n.getHours()).padStart(2,'0')+":"+String(n.getMinutes()).padStart(2,'0'); }
+function isToday(){ const n=new Date(); const t=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,'0')+"-"+String(n.getDate()).padStart(2,'0'); return t===DATE; }
+
+function badge(st){
+  st = st || '正常';
+  const [fg,bg] = STYLE[st] || ['#334155','#e2e8f0'];
+  return `<span class="badge" style="color:${fg};background:${bg}">${st}</span>`;
+}
+
+function leaveBadge(d){
+  const lv=d.leave;
+  const lr = d.leave_remain;
+  const sr = d.suspend_remain;
+  if(!lv && lr===undefined && sr===undefined) return '';
+  const parts = [];
+  if(lv) parts.push(`本月${lv.this_month} · 近30天${lv.last30}`);
+  if(lr!==undefined && lr!==null) parts.push(`剩余请假${lr}`);
+  if(sr!==undefined && sr!==null) parts.push(`剩余停课${sr}`);
+  if(!parts.length) return '';
+  const hf = lv && (lv.this_month>=LEAVE_CFG.hf_month || lv.last30>=LEAVE_CFG.hf_30);
+  const cls = hf ? 'leave-badge hf' : 'leave-badge';
+  return `<div class="${cls}">${parts.join(' · ')}${hf?' 🔴建议班主任回访':''}</div>`;
+}
+function isHighFreq(d){ return d.leave && (d.leave.this_month>=LEAVE_CFG.hf_month || d.leave.last30>=LEAVE_CFG.hf_30); }
+
+function timeInSlot(t, slot){
+  if(!t || !t.includes(':')) return false;
+  const h = parseInt(t.split(':')[0], 10);
+  if(slot==='am') return h>=0 && h<=11;
+  if(slot==='pm') return h>=12 && h<=17;
+  if(slot==='eve') return h>=18 && h<=23;
+  return false;
+}
+function filtered(){
+  const g=$('fGroup').value, lp=$('fLp').value, st=$('fStatus').value, kw=$('fKw').value.trim(), hr=$('fHour').value, lang=$('fLang').value;
+  const up=$('chipUpcoming').classList.contains('on');
+  const ab=$('chipAbn').classList.contains('on');
+  const hf=$('chipHighFreq').classList.contains('on');
+  const now = nowHM(), today = isToday();
+  return DATA.filter(d=>{
+    if(g && d.group!==g) return false;
+    if(lp && d.lp!==lp) return false;
+    if(st && (d.status||'正常')!==st) return false;
+    if(lang && normLang(d.lang)!==lang) return false;
+    if(hr && !timeInSlot(d.time, hr)) return false;
+    if(up && today && (d.time||'') < now) return false;
+    if(ab && ['正常','已完成'].includes(d.status||'正常')) return false;
+    if(hf && !isHighFreq(d)) return false;
+    if(kw){
+      const s=(d.student||'')+(d.wandou_id||'')+(d.teacher||'')+(d.lp||'');
+      if(!s.includes(kw)) return false;
+    }
+    return true;
+  });
+}
+
+let renderLimit = 80, lastFilterKey = '';
+function curFilterKey(){
+  return [$('fLp').value, $('fGroup').value, $('fStatus').value, $('fHour').value, $('fKw').value, ABN_STATUS].join('|');
+}
+function render(){
+  const rows = filtered();
+  const now = nowHM(), today = isToday();
+  // 筛选条件变化时重置分页，避免「加载更多」累积
+  const fk = curFilterKey();
+  if(fk !== lastFilterKey){ lastFilterKey = fk; renderLimit = 80; }
+  const view = rows.slice(0, renderLimit);
+  const more = rows.length - view.length;
+  const rowHtml = view.length ? view.map(d=>{
+    const soon = today && d.time && d.time>=now && timeDiffMin(now, d.time)<=30 && !['请假','已完成'].includes(d.status||'');
+    const rowLate = (d.status==='迟到');
+    return `<tr class="${soon?'soon':''}${rowLate?' row-late':''}" ondblclick="navigator.clipboard.writeText('${d.wandou_id||''}')" title="${soon?'30分钟内开课！':(rowLate?'⏰ 开课3分钟仍未进教室，已私信班主任提醒到课':'')}">
+      <td class="time-cell" data-label="时间">${d.time||'-'}${d.end_time?('<span class=muted>-'+d.end_time+'</span>'):''}${soon?' 🔔':''}${rowLate?' ⏰':''}</td>
+      <td data-label="状态">${badge(d.status)}</td>
+      <td data-label="学生"><b>${d.student||'-'}</b>${leaveBadge(d)}</td>
+      <td data-label="豌豆ID">${d.wandou_id||'-'}</td>
+      <td data-label="班主任">${d.lp||'-'}</td>
+      <td data-label="级别">${d.level||'-'}</td>
+      <td data-label="语种"><span class="lang-tag">${normLang(d.lang)}</span></td>
+      <td data-label="老师">${d.teacher||'-'}</td>
+      <td class="muted" data-label="课程">${d.course_name||'-'}</td>
+      <td class="muted" data-label="组">${d.group||'-'}</td>
+    </tr>`;
+  }).join('') : (()=>{
+    const parts=[];
+    if($('fGroup').value) parts.push('组：'+$('fGroup').value);
+    if($('fLp').value) parts.push('LP：'+$('fLp').value);
+    if($('fStatus').value) parts.push('状态：'+$('fStatus').value);
+    if($('fLang').value) parts.push('语种：'+$('fLang').value);
+    if($('fHour').value){
+      const slotLabel = {am:'上午',pm:'下午',eve:'晚上'}[$('fHour').value] || $('fHour').value;
+      parts.push('时段：'+slotLabel);
+    }
+    if($('fKw').value.trim()) parts.push('关键词：'+$('fKw').value.trim());
+    if($('chipUpcoming').classList.contains('on')) parts.push('只看未开课');
+    if($('chipAbn').classList.contains('on')) parts.push('只看请假/补课');
+    if($('chipHighFreq').classList.contains('on')) parts.push('高频请假');
+    const filterTip = parts.length ? `<div style="font-size:12px;margin-top:8px;color:#64748b">当前筛选：${parts.join(' · ')}</div><div style="margin-top:10px"><button type="button" onclick="clearAllFilters();render();" style="padding:6px 14px;border:1px solid #3b82f6;border-radius:6px;background:#eff6ff;color:#2563eb;cursor:pointer;font-weight:600">清除筛选</button></div>` : '';
+    return `<tr><td colspan="10" style="text-align:center;color:#64748b;padding:32px 16px"><div style="font-size:15px;font-weight:600;color:#334155;margin-bottom:6px">未找到匹配数据</div>${filterTip || '<div style="font-size:12px;color:#94a3b8">该日期暂无上课学员</div>'}</td></tr>`;
+  })();
+  const moreHtml = more>0 ? `<tr><td colspan="10" style="text-align:center;padding:12px"><button type="button" onclick="renderLimit+=80;render()" style="padding:8px 18px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-weight:600">⬇ 加载更多（剩余 ${more} 条）</button></td></tr>` : '';
+  $('tbody').innerHTML = rowHtml + moreHtml;
+  $('cnt').textContent = rows.length;
+  renderCards(rows);
+  renderSchedule();
+}
+
+function renderLate(obj){
+  obj = obj || ((typeof LATE !== 'undefined' && LATE) ? LATE : {});
+  const arr = obj.late || [];
+  // 填充 LP 下拉（迟到 / 旷课）
+  const allLps = uniq(arr.map(d=>d.lp).filter(Boolean)).sort();
+  ['fLateLp','fAbsentLp','fHistLp'].forEach(id=>{
+    const sel = $(id); if(!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">全部班主任</option>' + allLps.map(lp=>`<option value="${lp}">${lp}</option>`).join('');
+    sel.value = cur && allLps.includes(cur) ? cur : '';
+    if(!sel._bound){ sel.onchange = ()=> renderLate(obj); sel._bound = true; }
+  });
+  const lateLp = $('fLateLp') ? $('fLateLp').value : '';
+  const absentLp = $('fAbsentLp') ? $('fAbsentLp').value : '';
+  const histLp = $('fHistLp') ? $('fHistLp').value : '';
+  const active = arr.filter(d=>d.status==='late' && (!lateLp || d.lp===lateLp));                 // 进行中：开课3分钟仍未进
+  const absent = arr.filter(d=>d.status==='absent' && (!absentLp || d.lp===absentLp));                // 旷课：整节课结束仍未到且未请假
+  const history = arr.filter(d=>d.status!=='late' && d.status!=='absent' && (!histLp || d.lp===histLp)); // 已到课 / 最终请假等
+  // —— 进行中迟到（红，突出）——
+  $('lateBody').innerHTML = active.length ? active.map(d=>{
+    const badge='待班主任提醒到课'; const bg='#fef3c7'; const color='#92400e';
+    return `<tr>
+      <td>${d.lp||'-'}</td>
+      <td><b>${d.student||'-'}</b></td>
+      <td>${d.wandou_id||'-'}</td>
+      <td>${d.start||'-'}${d.end?'~'+d.end:'~'}</td>
+      <td style="color:#dc2626;font-weight:700">${d.minutes} 分钟</td>
+      <td>${d.teacher||'-'}</td>
+      <td class="muted">${d.course||'-'}</td>
+      <td><span style="background:${bg};color:${color};border-radius:6px;padding:3px 8px;font-size:12px">${badge}</span></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:#16a34a;padding:24px">✅ 当前没有「开课≥3分钟仍未进教室」的学员</td></tr>';
+  // —— 今日旷课（单独展示，不推送）——
+  $('absentBody').innerHTML = absent.length ? absent.map(d=>{
+    const badge='旷课（已下课且未请假）'; const bg='#fee2e2'; const color='#b91c1c';
+    return `<tr style="background:#fff5f5">
+      <td>${d.lp||'-'}</td>
+      <td><b>${d.student||'-'}</b></td>
+      <td>${d.wandou_id||'-'}</td>
+      <td>${d.start||'-'}${d.end?'~'+d.end:'~'}</td>
+      <td style="color:#b91c1c;font-weight:700">${d.minutes!=null ? d.minutes+' 分钟' : '-'}</td>
+      <td>${d.teacher||'-'}</td>
+      <td class="muted">${d.course||'-'}</td>
+      <td><span style="background:${bg};color:${color};border-radius:6px;padding:3px 8px;font-size:12px">${badge}</span></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:#16a34a;padding:24px">✅ 当前没有旷课学员</td></tr>';
+  // —— 今日历史（淡化，折叠）：已到课 / 最终请假等 ——
+  $('lateHistoryBody').innerHTML = history.length ? history.map(d=>{
+    const entered = d.status==='entered';
+    const final_absent = d.status==='final_absent';
+    const final_label = d.final_status ? ('最终：' + d.final_status + (d.final_reason ? ('（'+d.final_reason+'）') : '')) : '';
+    let badge, bg, color, dim='opacity:.7';
+    if (entered) { badge='已到课'; bg='#dcfce7'; color='#16a34a'; }
+    else if (final_absent) { badge=final_label||'最终未到课'; bg='#f3f4f6'; color='#6b7280'; }
+    else { badge=d.status||'-'; bg='#f3f4f6'; color='#6b7280'; }
+    return `<tr style="${dim}">
+      <td>${d.lp||'-'}</td>
+      <td><b>${d.student||'-'}</b></td>
+      <td>${d.wandou_id||'-'}</td>
+      <td>${d.start||'-'}${d.end?'~'+d.end:'~'}</td>
+      <td>${d.minutes!=null ? d.minutes+' 分钟' : '-'}</td>
+      <td>${d.teacher||'-'}</td>
+      <td class="muted">${d.course||'-'}</td>
+      <td><span style="background:${bg};color:${color};border-radius:6px;padding:3px 8px;font-size:12px">${badge}</span></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:18px">今日暂无历史记录</td></tr>';
+  $('tabLateCnt').textContent = active.length;
+  $('lateHistCnt').textContent = history.length;
+  // 巡检时间 + 守护健康度指示（优先用实时健康文件，回退到 LATE 快照）
+  updateHealth((LATE && LATE.last_patrol) || '', (LATE && LATE.daemon_ok) || false);
+  const enteredCnt = arr.filter(d=>d.status==='entered').length;
+  const absentCnt = absent.length;
+  $('lateCards').innerHTML =
+      '<div class="card"><div class="num" style="color:#dc2626">'+active.length+'</div><div class="lbl">进行中未到课</div></div>'
+    + '<div class="card"><div class="num" style="color:#b45309">'+arr.length+'</div><div class="lbl">今日累计迟到</div></div>'
+    + '<div class="card"><div class="num" style="color:#16a34a">'+enteredCnt+'</div><div class="lbl">已到课</div></div>'
+    + '<div class="card"><div class="num" style="color:#b91c1c">'+absentCnt+'</div><div class="lbl">旷课</div></div>';
+}
+function toggleLateHist(){
+  const w = $('lateHistWrap');
+  w.style.display = (w.style.display==='none' || !w.style.display) ? 'block' : 'none';
+}
+
+function updateHealth(lp, ok){
+  if ($('lateGenAt')) $('lateGenAt').textContent = lp || '-';
+  if (!$('daemonHealth')) return;
+  let txt, bg, color;
+  if (!lp) { txt = '未知'; bg = '#fef3c7'; color = '#92400e'; }
+  else {
+    const t = new Date(lp.replace(/-/g, '/'));
+    const sec = (Date.now() - t.getTime()) / 1000;
+    const hasUpcoming = (DATA||[]).some(d => d.time && d.time > nowHM());
+    if (sec > 600) {
+      if (hasUpcoming) { txt = '⚠️ 巡检停滞 ' + Math.floor(sec/60) + ' 分钟'; bg = '#fee2e2'; color = '#b91c1c'; }
+      else { txt = '💤 守护空闲（今日无后续课）'; bg = '#f1f5f9'; color = '#64748b'; }
+    }
+    else if (ok) { txt = '✅ 守护正常'; bg = '#dcfce7'; color = '#16a34a'; }
+    else { txt = '⚠️ 守护异常'; bg = '#fef3c7'; color = '#92400e'; }
+  }
+  const el = $('daemonHealth');
+  el.textContent = txt; el.style.background = bg; el.style.color = color;
+  el.style.borderRadius = '6px'; el.style.padding = '2px 8px'; el.style.fontSize = '12px';
+}
+
+async function loadHealth(){
+  if (!(LATE_API_BASE && LATE_API_TOKEN)) return;
+  try {
+    const res = await fetch(LATE_API_BASE + '/health_' + DATE + '.json?t=' + Date.now(),
+                            { headers: { 'Authorization': 'Bearer ' + LATE_API_TOKEN } });
+    if (!res.ok) return;
+    let data = await res.json();
+    if (data && typeof data.content === 'string') {
+      try { data = JSON.parse(atob(data.content.trim())); } catch(e){ return; }
+    }
+    if (data && data.last_patrol) updateHealth(data.last_patrol, data.daemon_ok);
+  } catch(e) { /* 健康源不可用，保留 LATE 快照值 */ }
+}
+
+async function loadLate(){
+  // 候选源：1) 私有数据仓库 GitHub Contents API（实时，带 token + base64） 2) 同源 late_<date>.json 3) 内嵌快照
+  const candidates = [];
+  if (LATE_API_BASE && LATE_API_TOKEN) {
+    candidates.push({
+      url: LATE_API_BASE + '/late_' + DATE + '.json?t=' + Date.now(),
+      headers: { 'Authorization': 'Bearer ' + LATE_API_TOKEN }
+    });
+  }
+  candidates.push({ url: 'late_' + DATE + '.json?t=' + Date.now() });
+  for (const c of candidates) {
+    try {
+      const res = await fetch(c.url, c.headers ? { headers: c.headers } : {});
+      if (!res.ok) continue;
+      let data = await res.json();
+      // GitHub Contents API 返回 {content: base64, encoding: 'base64'}，需解码
+      if (data && typeof data.content === 'string') {
+        try { data = JSON.parse(atob(data.content.trim())); } catch(e) { continue; }
+      }
+      if (data && Array.isArray(data.late)) {
+        LATE = data;
+        renderLate(LATE);
+        return;
+      }
+    } catch(e) { /* 该源不可用，尝试下一个候选源 */ }
+  }
+}
+function timeDiffMin(a,b){
+  const [h1,m1]=a.split(':').map(Number),[h2,m2]=b.split(':').map(Number);
+  return (h2*60+m2)-(h1*60+m1);
+}
+
+function prevHour(t){ if(!t) return -1; const h=parseInt(t.split(':')[0],10); return isNaN(h)?-1:h; }
+function prevInSlot(t, slot){
+  const h = prevHour(t); if(h<0) return false;
+  if(slot==='am') return h>=0 && h<12;
+  if(slot==='pm') return h>=12 && h<18;
+  if(slot==='eve') return h>=18 && h<24;
+  return false;
+}
+function prevTimeOf(d){ return d.time || d.start || ''; }
+function renderPrevFollow(){
+  const box = $('prevFollowBox');
+  const body = $('prevBody');
+  const filters = $('prevFilters');
+  const lpSel = $('prevFilterLp');
+  const timeSel = $('prevFilterTime');
+  if(!box || !body || !PREV_FOLLOW) return;
+  const allLeave = (PREV_FOLLOW.leave || []).slice();
+  const allLate = (PREV_FOLLOW.late || []);
+  $('prevDate').textContent = PREV_FOLLOW.date || '前一天';
+  if(!allLeave.length && !allLate.length){ box.style.display='none'; return; }
+  box.style.display='block';
+  // 折叠区默认收起（仅 head 可见），点击 head 才展开
+  // 初始化 LP 下拉（保留当前选中）
+  if(lpSel){
+    const selected = lpSel.value;
+    const lps = Array.from(new Set([...allLeave, ...allLate].map(d=>d.lp||'-').filter(Boolean))).sort();
+    lpSel.innerHTML = '<option value="">全部 LP</option>' + lps.map(lp=>`<option value="${lp}">${lp}</option>`).join('');
+    if(lps.includes(selected)) lpSel.value = selected;
+  }
+  const activeLp = lpSel ? lpSel.value : '';
+  const activeSlot = timeSel ? timeSel.value : '';
+  let leave = allLeave.filter(d=>{
+    if(activeLp && (d.lp||'-') !== activeLp) return false;
+    if(activeSlot && !prevInSlot(prevTimeOf(d), activeSlot)) return false;
+    return true;
+  }).sort((a,b)=> ((a.time||'')+(a.lp||'')).localeCompare((b.time||'')+(b.lp||'')));
+  let late = allLate.filter(d=>{
+    if(activeLp && (d.lp||'-') !== activeLp) return false;
+    if(activeSlot && !prevInSlot(prevTimeOf(d), activeSlot)) return false;
+    return true;
+  }).sort((a,b)=> ((a.start||'')+(a.lp||'')).localeCompare((b.start||'')+(b.lp||'')));
+  const total = leave.length + late.length;
+  if($('prevCount')) $('prevCount').textContent = `共 ${total} 人`;
+  const prevDate = PREV_FOLLOW.date || '';
+  const dateTag = prevDate ? `<span class="prev-date">${prevDate.slice(5)}</span>` : '';
+  const leaveBlock = leave.length ? `<div class="prev-section">
+    <div class="prev-section-title"><span>📝 请假未补课（${leave.length}人）</span></div>
+    ${leave.map(d=>`<div class="prev-row">
+      ${dateTag}
+      <span class="prev-time">${(d.time||'-')}~${(d.end_time||'-')}</span>
+      <span class="prev-student">
+        <span class="prev-name-line"><b>${d.student||'-'}</b>${d.wandou_id?'<span class="muted">'+d.wandou_id+'</span>':''}${d.reason?'<span class="prev-reason">'+d.reason+'</span>':''}</span>
+        <span class="prev-meta-line">${d.lp||'-'}${d.teacher?' · '+d.teacher:''}</span>
+      </span>
+    </div>`).join('')}
+  </div>` : '';
+  const lateBlock = late.length ? `<div class="prev-section">
+    <div class="prev-section-title"><span>⏰ 迟到未到课（${late.length}人）</span></div>
+    ${late.map(d=>`<div class="prev-row">
+      ${dateTag}
+      <span class="prev-time">${(d.start||'-')}~${(d.end||'-')}</span>
+      <span class="prev-student">
+        <span class="prev-name-line"><b>${d.student||'-'}</b>${d.wandou_id?'<span class="muted">'+d.wandou_id+'</span>':''}${d.final_status?'<span class="prev-status">'+d.final_status+'</span>':''}${d.final_reason?'<span class="prev-reason">'+d.final_reason+'</span>':''}</span>
+        <span class="prev-meta-line">${d.lp||'-'}${d.teacher?' · '+d.teacher:''}</span>
+      </span>
+    </div>`).join('')}
+  </div>` : '';
+  body.innerHTML = `<div class="prev-grid">${leaveBlock}${lateBlock}</div>`;
+  if(!leaveBlock && !lateBlock) body.innerHTML = '<div style="text-align:center;color:#b45309;padding:18px;font-size:13px">当前筛选条件下暂无记录</div>';
+}
+if($('prevFilterLp')) $('prevFilterLp').onchange = renderPrevFollow;
+if($('prevFilterTime')) $('prevFilterTime').onchange = renderPrevFollow;
+function togglePrevFollow(){
+  const c = $('prevCollapse'); const arrow = $('prevArrow');
+  if(!c) return;
+  const open = c.style.display !== 'none';
+  c.style.display = open ? 'none' : 'block';
+  if(arrow) arrow.textContent = open ? '▶' : '▼';
+}
+
+function renderCards(rows){
+  const total=rows.length;
+  const leave=rows.filter(d=>d.status==='请假').length;
+  const makeup=rows.filter(d=>d.status==='补课').length;
+  const now=nowHM(), today=isToday();
+  const upcoming=today?rows.filter(d=>(d.time||'')>=now && !['请假','已完成'].includes(d.status||'')).length:total;
+  const soon=today?rows.filter(d=>d.time && d.time>=now && timeDiffMin(now,d.time)<=30 && !['请假','已完成'].includes(d.status||'')).length:0;
+  const hf=rows.filter(d=>isHighFreq(d)).length;
+  $('cards').innerHTML = `
+    <div class="card"><div class="num">${total}</div><div class="lbl">今日总课程</div></div>
+    <div class="card"><div class="num" style="color:#16a34a">${upcoming}</div><div class="lbl">待上课</div></div>
+    <div class="card"><div class="num" style="color:#d97706">${soon}</div><div class="lbl">30分钟内开课 🔔</div></div>
+    <div class="card"><div class="num" style="color:#dc2626">${leave}</div><div class="lbl">请假</div></div>
+    <div class="card"><div class="num" style="color:#7c3aed">${makeup}</div><div class="lbl">补课</div></div>
+    <div class="card"><div class="num" style="color:#b45309">${hf}</div><div class="lbl">🔴高频请假(建议回访)</div></div>`;
+  const activeLp=$('fLp').value, activeGroup=$('fGroup').value, activeStatus=$('fStatus').value;
+  const scope = activeLp ? activeLp : (activeGroup ? activeGroup : '全部');
+  const abn = rows.filter(d=>!['正常','已完成'].includes(d.status||'正常'));
+  if(abn.length){
+    $('abnBox').style.display='block';
+    const byTime = {};
+    const leaveCnt = abn.filter(d=>d.status==='请假').length;
+    const makeupCnt = abn.filter(d=>d.status==='补课').length;
+    const cancelCnt = abn.filter(d=>d.status==='取消').length;
+    const lateCnt = abn.filter(d=>d.status==='迟到').length;
+    const otherCnt = abn.filter(d=>!['请假','补课','取消','迟到'].includes(d.status||'')).length;
+    let showAbn = abn;
+    if(ABN_STATUS && ABN_STATUS!=='其他') showAbn = showAbn.filter(d=>d.status===ABN_STATUS);
+    if(ABN_STATUS==='其他') showAbn = showAbn.filter(d=>!['请假','补课','取消'].includes(d.status||''));
+    showAbn.forEach(d=>{ byTime[d.time||'待定'] = byTime[d.time||'待定'] || []; byTime[d.time||'待定'].push(d); });
+    const times = Object.keys(byTime).sort();
+    const summary = `<div class="abn-summary">
+      <select id="fLpTop"><option value="">全部LP</option></select>
+      <span>⚠️ ${scope} 需关注学员共 ${abn.length} 人</span>
+      <span class="abn-chip ${ABN_STATUS==='请假'?'active':''}" onclick="setAbnStatus('请假')">请假 <span class="cnt">${leaveCnt}</span></span>
+      <span class="abn-chip ${ABN_STATUS==='补课'?'active':''}" onclick="setAbnStatus('补课')">补课 <span class="cnt">${makeupCnt}</span></span>
+      <span class="abn-chip ${ABN_STATUS==='取消'?'active':''}" onclick="setAbnStatus('取消')">取消 <span class="cnt">${cancelCnt}</span></span>
+      ${lateCnt?`<span class="abn-chip ${ABN_STATUS==='迟到'?'active':''}" onclick="setAbnStatus('迟到')">迟到 <span class="cnt">${lateCnt}</span></span>`:''}
+      ${otherCnt?`<span class="abn-chip ${ABN_STATUS==='其他'?'active':''}" onclick="setAbnStatus('其他')">其他 <span class="cnt">${otherCnt}</span></span>`:''}
+    </div>`;
+    const grid = `<div class="abn-grid">${times.map(t=>{
+      const list = byTime[t].sort((a,b)=> (a.lp||'').localeCompare(b.lp||''));
+      return `<div class="abn-section">
+        <div class="abn-section-title"><span>${t} · ${list.length}人</span></div>
+        ${list.map(d=>`<div class="abn-row">
+          <span class="abn-time">${d.time||'-'}</span>
+          ${badge(d.status)}
+          <span class="abn-student"><b>${d.student||'-'}</b>${d.wandou_id?'<span class="muted">'+d.wandou_id+'</span>':''}${d.reason?'<span class="abn-reason">'+d.reason+'</span>':''}${leaveBadge(d)}</span>
+          <span class="abn-lp">${d.lp||'-'}</span>
+        </div>`).join('')}
+      </div>`;
+    }).join('')}</div>`;
+    $('abnBox').innerHTML = summary + grid;
+    const lpTop = $('fLpTop');
+    if(lpTop){
+      lpTop.innerHTML = '<option value="">全部LP</option>';
+      uniq(DATA.map(d=>d.lp)).forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; lpTop.appendChild(o); });
+      lpTop.value = $('fLp').value;
+      lpTop.onchange = ()=>{ $('fLp').value = lpTop.value; render(); };
+    }
+  } else {
+    $('abnBox').style.display='none';
+  }
+}
+
+function renderSchedule(){
+  // 优先展示「要上课的学员」：正常/补课/上课中/调课（排除 取消、请假）
+  let rows = filtered().filter(d => ['正常','补课','上课中','调课'].includes(d.status||'正常'));
+  if(SCHED_STATUS) rows = rows.filter(d => (d.status||'正常') === SCHED_STATUS);
+  if(SCHED_TEACHER) rows = rows.filter(d => d.teacher === SCHED_TEACHER);
+  const box = $('schedBox');
+  if(!rows.length){ box.style.display='none'; return; }
+  box.style.display='block';
+  const byTime = {};
+  rows.forEach(d=>{ const t=d.time||'待定'; (byTime[t]=byTime[t]||[]).push(d); });
+  const times = Object.keys(byTime).sort();
+  const total = rows.length;
+  const schedStatuses = ['正常','补课','上课中','调课'];
+  const statusChips = `<div class="sched-status-chip">${schedStatuses.map(st=>{
+    const cnt = rows.filter(d=>(d.status||'正常')===st).length;
+    const active = SCHED_STATUS===st ? 'active' : '';
+    return `<span class="${active}" onclick="setSchedStatus('${st}')">${st}<span class="cnt">${cnt}</span></span>`;
+  }).join('')}</div>`;
+  const teacherOpts = '<option value="">全部主讲老师</option>' + uniq(DATA.map(d=>d.teacher)).filter(Boolean).map(t=>`<option value="${t}">${t}</option>`).join('');
+  const head = `<div class="sched-head">📅 各时间段要上课的学员（共 ${total} 人 · 按开课时间分组）
+    ${statusChips}
+    <select id="fLpSched" style="padding:4px 8px;border:1px solid #bbf7d0;border-radius:6px;background:#fff;color:#15803d;font-size:12px;font-weight:600"><option value="">全部LP</option></select>
+    <select id="fHourSched" style="padding:4px 8px;border:1px solid #bbf7d0;border-radius:6px;background:#fff;color:#15803d;font-size:12px;font-weight:600"><option value="">全部时段</option></select>
+    <select id="fTeacherSched" style="padding:4px 8px;border:1px solid #bbf7d0;border-radius:6px;background:#fff;color:#15803d;font-size:12px;font-weight:600">${teacherOpts}</select>
+    <span class="muted">LP/时段联动主表，状态/老师仅过滤本区</span>
+  </div>`;
+  const grid = `<div class="sched-grid">${times.map(t=>{
+    const list = byTime[t].sort((a,b)=>(a.lp||'').localeCompare(b.lp||''));
+    return `<div class="sched-section">
+      <div class="sched-section-title"><span>${t} · ${list.length}人</span></div>
+      <div class="sched-list">${list.map(d=>`<div class="sched-row">
+        <span class="sched-time">${d.time||'-'}</span>
+        ${badge(d.status)}
+        <span class="sched-student"><b>${d.student||'-'}</b>${d.wandou_id?'<span class="muted">'+d.wandou_id+'</span>':''}</span>
+        <span class="sched-lp">${d.lp||'-'}${d.teacher?' · '+d.teacher:''}</span>
+      </div>`).join('')}</div>
+    </div>`;
+  }).join('')}</div>`;
+  box.innerHTML = head + grid;
+  const lpSched = $('fLpSched');
+  if(lpSched){
+    uniq(DATA.map(d=>d.lp)).forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; lpSched.appendChild(o); });
+    lpSched.value = $('fLp').value;
+    lpSched.onchange = ()=>{ $('fLp').value = lpSched.value; render(); };
+  }
+  const hrSched = $('fHourSched');
+  if(hrSched){
+    hrSched.innerHTML = '<option value="">全部时段</option>'
+      + '<option value="am">上午 00:00-11:59</option>'
+      + '<option value="pm">下午 12:00-17:59</option>'
+      + '<option value="eve">晚上 18:00-23:59</option>';
+    hrSched.value = $('fHour').value;
+    hrSched.onchange = ()=>{ $('fHour').value = hrSched.value; syncHourHighlight(); render(); };
+  }
+  const teacherSched = $('fTeacherSched');
+  if(teacherSched){
+    teacherSched.value = SCHED_TEACHER;
+    teacherSched.onchange = ()=>{ SCHED_TEACHER = teacherSched.value; renderSchedule(); };
+  }
+}
+function setSchedStatus(st){
+  SCHED_STATUS = (SCHED_STATUS===st ? '' : st);
+  renderSchedule();
+}
+function setAbnStatus(st){
+  ABN_STATUS = (ABN_STATUS===st ? '' : st);
+  render();
+}
+
+function hour2slot(hStr){
+  const h = parseInt(hStr.split(':')[0], 10);
+  if(h>=0 && h<=11) return 'am';
+  if(h>=12 && h<=17) return 'pm';
+  return 'eve';
+}
+function renderTimeline(){
+  const cnt={};
+  for(let h=0; h<=23; h++){ cnt[String(h).padStart(2,'0')+':00'] = 0; }
+  DATA.forEach(d=>{ if(d.time&&d.time.includes(':')){ const h=d.time.split(':')[0]+':00'; cnt[h]=(cnt[h]||0)+1; } });
+  const hours=Object.keys(cnt).sort();
+  const max=Math.max(...Object.values(cnt),1);
+  $('tlBars').innerHTML = hours.map(h=>
+    `<div class="tl-bar" data-h="${h}" style="height:${Math.max(cnt[h]/max*100,8)}%;${cnt[h]===0?'background:#e2e8f0;':''}" title="${h}  ${cnt[h]}人"><span>${cnt[h]}</span><em>${h}</em></div>`
+  ).join('');
+  document.querySelectorAll('.tl-bar').forEach(b=>b.onclick=()=>{
+    const slot = hour2slot(b.dataset.h);
+    const cur=$('fHour').value;
+    $('fHour').value = (cur===slot) ? '' : slot;
+    syncHourHighlight();
+    render();
+  });
+}
+function syncHourHighlight(){
+  const slot=$('fHour').value;
+  document.querySelectorAll('.tl-bar').forEach(x=>{
+    x.style.background = (slot && hour2slot(x.dataset.h)===slot) ? '#f59e0b' : '#3b82f6';
+  });
+}
+
+['fGroup','fLp','fStatus','fHour','fLang'].forEach(id=>$(id).onchange=()=>{ syncHourHighlight(); render(); });
+$('fKw').oninput=render;
+$('chipUpcoming').onclick=()=>{$('chipUpcoming').classList.toggle('on');render();};
+$('chipAbn').onclick=()=>{$('chipAbn').classList.toggle('on');render();};
+$('chipHighFreq').onclick=()=>{$('chipHighFreq').classList.toggle('on');render();};
+$('chipClear').onclick=()=>{
+  clearAllFilters();
+  render();
+};
+function clearAllFilters(){
+  ['fGroup','fLp','fStatus','fHour','fLang','fSusLp','fSusRange'].forEach(id=>{ if($(id)) $(id).value=''; });
+  $('fKw').value='';
+  ['chipUpcoming','chipAbn','chipHighFreq'].forEach(id=>$(id).classList.remove('on'));
+  SCHED_STATUS=''; SCHED_TEACHER=''; ABN_STATUS=''; SUS_RANGE='';
+  syncHourHighlight();
+}
+function refreshData(){
+  if(!isServe) return;  // 静态托管无后端，按钮已隐藏，防御性返回
+  const btn=$('btnRefresh'), msg=$('refreshMsg');
+  btn.disabled=true; btn.textContent='🔄 刷新中...'; msg.textContent='正在重新抓取 '+DATE+' 的课表...';
+  fetch('/refetch?date='+DATE).then(()=>{
+    const iv=setInterval(()=>{
+      fetch('/fetchstatus?date='+DATE).then(r=>r.json()).then(s=>{
+        if(!s.running){
+          clearInterval(iv);
+          if(s.ok){ msg.textContent='✅ 已于 '+s.at+' 更新，正在重载...'; location.reload(); }
+          else { btn.disabled=false; btn.textContent='🔄 刷新当天数据'; msg.textContent='❌ 刷新失败：'+(s.msg||''); }
+        }
+      });
+    },3000);
+  }).catch(e=>{ btn.disabled=false; btn.textContent='🔄 刷新当天数据'; msg.textContent='❌ 请求失败：'+e; });
+}
+let autoOn=false, lastAutoKey='';
+$('chipAuto').onclick=()=>{
+  autoOn=!$('chipAuto').classList.contains('on');
+  $('chipAuto').classList.toggle('on', autoOn);
+  $('refreshMsg').textContent = autoOn ? '已开启：每天整点自动重抓当天课表' : '';
+};
+function autoTick(){
+  if(!autoOn) return;
+  const n=new Date(), key=n.getFullYear()+'-'+n.getDate()+'-'+n.getHours();
+  if(n.getMinutes()<2 && isToday() && lastAutoKey!==key){ lastAutoKey=key; refreshData(); }
+}
+setInterval(autoTick, 30000);
+const SUS = [{"student": "Alex爸爸的號碼不要聯繫", "wandou_id": "28131239", "lp": "高庆兰", "level": "豌豆明思2026（英语） S4", "teacher": "Tess Kervin", "cycle": "周六:16:50/周日:20:10", "stop_range": "2026-08-02 ~ 2026-08-31", "start_time": "2026-08-02", "end_time": "2026-08-31", "operator_time": "2026-08-02 14:32:42", "reason": "外出旅游", "state": 1}, {"student": "vincent", "wandou_id": "28706717", "lp": "李欣旭", "level": "豌豆明思2026（英语） S2", "teacher": "Ariana", "cycle": "周三:08:00/周五:08:00", "stop_range": "2026-07-31 ~ 2026-08-29", "start_time": "2026-07-31", "end_time": "2026-08-29", "operator_time": "2026-07-31 14:10:54", "reason": "孩子学业忙", "state": 2}, {"student": "张浩霖", "wandou_id": "28272863", "lp": "高庆兰", "level": "豌豆明思2026（英语） S5", "teacher": "Ivy01", "cycle": "周二:10:00/周五:10:00", "stop_range": "2026-07-31 ~ 2026-08-29", "start_time": "2026-07-31", "end_time": "2026-08-29", "operator_time": "2026-07-31 12:04:40", "reason": "孩子学业忙", "state": 1}, {"student": "安妮", "wandou_id": "28321347", "lp": "李欣旭", "level": "豌豆明思2026（英语） S3", "teacher": "Skye老师", "cycle": "周三:07:00/周六:07:00", "stop_range": "2026-07-31 ~ 2026-08-29", "start_time": "2026-07-31", "end_time": "2026-08-29", "operator_time": "2026-07-31 10:35:56", "reason": "孩子学业忙", "state": 2}, {"student": "Barry", "wandou_id": "26889750", "lp": "李欣旭", "level": "豌豆明思2026（英语） S4", "teacher": "Alaine", "cycle": "周二:08:00/周四:08:00", "stop_range": "2026-07-30 ~ 2026-08-28", "start_time": "2026-07-30", "end_time": "2026-08-28", "operator_time": "2026-07-30 09:54:05", "reason": "孩子学业忙", "state": 2}, {"student": "ella", "wandou_id": "28720443", "lp": "李欣旭", "level": "豌豆明思2026（英语） S3", "teacher": "Esme", "cycle": "周一:14:00/周日:14:00", "stop_range": "2026-07-29 ~ 2026-08-27", "start_time": "2026-07-29", "end_time": "2026-08-27", "operator_time": "2026-07-29 14:19:26", "reason": "孩子学业忙", "state": 2}, {"student": "Jojo&Momo", "wandou_id": "27786948", "lp": "高庆兰", "level": "豌豆明思2026（英语） S3", "teacher": "Precious", "cycle": "周一:20:10/周四:20:10", "stop_range": "2026-07-29 ~ 2026-08-27", "start_time": "2026-07-29", "end_time": "2026-08-27", "operator_time": "2026-07-29 12:01:27", "reason": "孩子学业忙", "state": 1}, {"student": "Vito", "wandou_id": "28309133", "lp": "高庆兰", "level": "豌豆明思2026（英语） S6", "teacher": "Peanut老师", "cycle": "周一:10:00/周日:10:00", "stop_range": "2026-07-29 ~ 2026-08-27", "start_time": "2026-07-29", "end_time": "2026-08-27", "operator_time": "2026-07-29 09:52:44", "reason": "孩子学业忙", "state": 2}, {"student": "Andrew", "wandou_id": "28310719", "lp": "李欣旭", "level": "豌豆明思2026（英语） S6", "teacher": "Peanut老师", "cycle": "周一:10:00/周日:10:00", "stop_range": "2026-07-29 ~ 2026-08-27", "start_time": "2026-07-29", "end_time": "2026-08-27", "operator_time": "2026-07-29 09:52:04", "reason": "孩子学业忙", "state": 2}, {"student": "Wesley", "wandou_id": "28619963", "lp": "李欣旭", "level": "豌豆明思2026（英语） S4", "teacher": "Alaine", "cycle": "周二:07:00/周五:07:00", "stop_range": "2026-07-29 ~ 2026-08-27", "start_time": "2026-07-29", "end_time": "2026-08-27", "operator_time": "2026-07-29 08:24:21", "reason": "孩子学业忙", "state": 2}, {"student": "Seger", "wandou_id": "28165283", "lp": "高庆兰", "level": "豌豆明思2026（英语） S6", "teacher": "小潘潘老师", "cycle": "周四:10:00/周六:10:00", "stop_range": "2026-07-28 ~ 2026-08-26", "start_time": "2026-07-28", "end_time": "2026-08-26", "operator_time": "2026-07-28 11:51:00", "reason": "孩子学业忙", "state": 1}, {"student": "靖恩", "wandou_id": "27594371", "lp": "李欣旭", "level": "豌豆明思2026（英语） S6", "teacher": "Show老师", "cycle": "周一:18:30/周六:10:00", "stop_range": "2026-07-28 ~ 2026-08-26", "start_time": "2026-07-28", "end_time": "2026-08-26", "operator_time": "2026-07-28 11:28:11", "reason": "孩子学业忙", "state": 2}, {"student": "恪謙", "wandou_id": "28177381", "lp": "高庆兰", "level": "豌豆明思2026（英语） S4", "teacher": "Antheia", "cycle": "周六:19:20/周日:19:20", "stop_range": "2026-07-25 ~ 2026-08-23", "start_time": "2026-07-25", "end_time": "2026-08-23", "operator_time": "2026-07-25 19:54:37", "reason": "外出旅游", "state": 1}, {"student": "Crystal 宝贝", "wandou_id": "28690455", "lp": "李欣旭", "level": "豌豆明思2026（英语） S4", "teacher": "Bagel老师", "cycle": "周一:08:00/周六:08:00", "stop_range": "2026-07-25 ~ 2026-08-23", "start_time": "2026-07-25", "end_time": "2026-08-23", "operator_time": "2026-07-25 09:33:13", "reason": "孩子学业忙", "state": 1}, {"student": "妹妹欣柠", "wandou_id": "28278027", "lp": "李欣旭", "level": "豌豆明思2026（英语） S5", "teacher": "Rovie老师", "cycle": "周一:17:40/周三:17:40", "stop_range": "2026-07-24 ~ 2026-08-22", "start_time": "2026-07-24", "end_time": "2026-08-22", "operator_time": "2026-07-24 11:51:17", "reason": "孩子学业忙", "state": 2}, {"student": "Rhea", "wandou_id": "28706459", "lp": "李欣旭", "level": "豌豆明思2026（英语） S3", "teacher": "Shine老师", "cycle": "周一:08:00/周五:08:00", "stop_range": "2026-07-24 ~ 2026-08-22", "start_time": "2026-07-24", "end_time": "2026-08-22", "operator_time": "2026-07-24 10:05:21", "reason": "孩子学业忙", "state": 2}, {"student": "Evea Tan不要打电话", "wandou_id": "28659440", "lp": "高庆兰", "level": "豌豆明思2026（英语） S4", "teacher": "Alaine", "cycle": "周二:20:10/周四:20:10", "stop_range": "2026-07-24 ~ 2026-08-22", "start_time": "2026-07-24", "end_time": "2026-08-22", "operator_time": "2026-07-24 09:16:31", "reason": "孩子学业忙", "state": 2}, {"student": "俊睿", "wandou_id": "28389620", "lp": "高庆兰", "level": "豌豆明思2026（英语） S5", "teacher": "Rovie老师", "cycle": "周三:18:30/周五:18:30", "stop_range": "2026-07-23 ~ 2026-08-21", "start_time": "2026-07-23", "end_time": "2026-08-21", "operator_time": "2026-07-23 14:46:20", "reason": "孩子学业忙", "state": 1}, {"student": "小太阳", "wandou_id": "28102964", "lp": "李欣旭", "level": "豌豆明思2026（英语） S4", "teacher": "Kay", "cycle": "周二:19:20/周四:19:20", "stop_range": "2026-07-23 ~ 2026-08-20", "start_time": "2026-07-23", "end_time": "2026-08-20", "operator_time": "2026-07-23 08:06:46", "reason": "孩子学业忙", "state": 1}, {"student": "Louis", "wandou_id": "28627146", "lp": "李欣旭", "level": "豌豆明思2026（英语） S5", "teacher": "Thomas老师01", "cycle": "周四:19:20/周日:19:20", "stop_range": "2026-07-22 ~ 2026-08-20", "start_time": "2026-07-22", "end_time": "2026-08-20", "operator_time": "2026-07-22 14:36:27", "reason": "孩子学业忙", "state": 1}, {"student": "Harrison", "wandou_id": "28704144", "lp": "高庆兰", "level": "豌豆明思2026（英语） S1", "teacher": "Davina老师", "cycle": "周二:07:00/周四:07:00", "stop_range": "2026-07-22 ~ 2026-08-20", "start_time": "2026-07-22", "end_time": "2026-08-20", "operator_time": "2026-07-22 08:11:35", "reason": "孩子不喜欢，坐不住，要退课", "state": 1}, {"student": "嘟嘟", "wandou_id": "28613113", "lp": "李欣旭", "level": "豌豆明思2026（英语） S4", "teacher": "Shine老师", "cycle": "周六:10:00/周日:10:00", "stop_range": "2026-07-25 ~ 2026-08-23", "start_time": "2026-07-25", "end_time": "2026-08-23", "operator_time": "2026-07-21 16:11:38", "reason": "孩子学业忙", "state": 1}, {"student": "Alan", "wandou_id": "27450003", "lp": "李欣旭", "level": "豌豆明思2026（英语） S3", "teacher": "Irish老师", "cycle": "周二:09:00/周五:09:00", "stop_range": "2026-07-19 ~ 2026-08-17", "start_time": "2026-07-19", "end_time": "2026-08-17", "operator_time": "2026-07-19 14:14:13", "reason": "孩子学业忙", "state": 2}, {"student": "alva", "wandou_id": "28472710", "lp": "高庆兰", "level": "豌豆明思2026（英语） S4", "teacher": "Jannie", "cycle": "周四:15:00/周日:07:00", "stop_range": "2026-07-19 ~ 2026-08-17", "start_time": "2026-07-19", "end_time": "2026-08-17", "operator_time": "2026-07-19 14:01:04", "reason": "时间不合适，需要重新组班", "state": 1}, {"student": "Amelia姐姐", "wandou_id": "28073958", "lp": "李欣旭", "level": "豌豆明思2026（英语） S6", "teacher": "麦米米老师", "cycle": "周六:19:20/周日:19:20", "stop_range": "2026-07-25 ~ 2026-08-23", "start_time": "2026-07-25", "end_time": "2026-08-23", "operator_time": "2026-07-18 19:00:04", "reason": "孩子学业忙", "state": 1}];
+let SUS_RANGE = '';
+function daysDiff(a,b){
+  const da = a instanceof Date ? new Date(a.getTime()) : new Date(a+'T00:00:00');
+  const db = b instanceof Date ? new Date(b.getTime()) : new Date(b+'T00:00:00');
+  return Math.floor((db-da)/(1000*60*60*24));
+}
+function daysRangeInclusive(a,b){
+  const da = a instanceof Date ? new Date(a.getTime()) : new Date(a+'T00:00:00');
+  const db = b instanceof Date ? new Date(b.getTime()) : new Date(b+'T00:00:00');
+  return Math.floor((db-da)/(1000*60*60*24)) + 1;
+}
+function rangeOverlap(s, days){
+  if(!days) return true;
+  if(!s.start_time) return false;
+  const stopped = daysDiff(new Date(s.start_time+'T00:00:00'), new Date(DATE+'T00:00:00'));
+  return stopped >= 0 && stopped <= parseInt(days, 10);
+}
+function renderSus(){
+  const lp = $('fSusLp').value;
+  let rows = SUS.filter(s=>!lp || s.lp===lp);
+  rows = rows.filter(s=>rangeOverlap(s, SUS_RANGE));
+  $('susCnt').textContent = rows.length;
+  $('tabSusCnt').textContent = SUS.length;
+  $('susTotal').textContent = SUS.length;
+  const today = new Date(DATE+'T00:00:00');
+  const avgDays = rows.length ? Math.round(rows.reduce((sum,s)=> sum + (s.start_time ? daysDiff(new Date(s.start_time+'T00:00:00'), today) : 0), 0) / rows.length) : 0;
+  const rangeLabel = SUS_RANGE ? `近 ${SUS_RANGE} 天` : '全部时间';
+  const rangeNew = rows.filter(s=> s.start_time && rangeOverlap(s, SUS_RANGE)).length;
+  $('susStats').textContent = `平均停课天数 ${avgDays} 天｜${rangeLabel} 内停课 ${rangeNew} 人`;
+
+  $('susBody').innerHTML = rows.map(s=>{
+    const start = s.start_time ? new Date(s.start_time+'T00:00:00') : null;
+    const end = s.end_time ? new Date(s.end_time+'T00:00:00') : null;
+    const stopped = start ? daysDiff(start, today) : '-';
+    const remain = end ? daysDiff(today, end) : '-';
+    const superLong = remain !== '-' && remain > 365;
+    const advice = wakeAdvice(stopped, remain, s.reason || '');
+    const longStop = stopped !== '-' && stopped >= 30;
+    return `<tr class="${longStop?'long-stop':''}"><td><b>${s.student||'-'}</b>${longStop?' <span style="color:#dc2626;font-size:11px">(已停≥30天)</span>':''}</td><td>${s.wandou_id||'-'}</td><td>${s.lp||'-'}</td><td>${s.level||'-'}</td><td>${s.teacher||'-'}</td><td title="原固定上课时间，停课期间不排课">${s.cycle||'-'}</td><td class="muted">${s.stop_range||'-'}</td><td>${stopped}</td><td class="${superLong?'super-long':''}">${remain}${superLong?' ⚠️ 超长停课':''}</td><td class="muted">${s.operator_time ? s.operator_time.slice(0,10) : '-'}</td><td class="muted">${s.reason||'-'}</td><td style="font-size:12px;line-height:1.5">${advice}</td></tr>`;
+  }).join('');
+  drawTrendChart(rows);
+  drawReasonChart(rows);
+}
+function drawTrendChart(rows){
+  const starts = {}, ends = {};
+  rows.forEach(s=>{
+    if(s.start_time){ const m=s.start_time.slice(0,7); starts[m]=(starts[m]||0)+1; }
+    if(s.end_time){ const m=s.end_time.slice(0,7); ends[m]=(ends[m]||0)+1; }
+  });
+  const months = [...new Set([...Object.keys(starts),...Object.keys(ends)])].sort();
+  if(months.length===0){ $('trendChart').innerHTML='<div class="chart-empty">无数据</div>'; return; }
+  const max = Math.max(1, ...months.map(m=> (starts[m]||0)+(ends[m]||0) ));
+  const W=680, H=220, ML=36, MR=10, MT=24, MB=28;
+  const step = (W-ML-MR)/months.length;
+  const barW = step*0.55;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  for(let i=0;i<=4;i++){
+    const y = MT + (H-MT-MB)*(1-i/4);
+    svg += `<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>`;
+    svg += `<text x="${ML-6}" y="${y+3}" text-anchor="end" font-size="10" fill="#94a3b8">${Math.round(max*i/4)}</text>`;
+  }
+  months.forEach((m, i)=>{
+    const x = ML + i*step + (step-barW)/2;
+    const h1 = ((starts[m]||0)/max)*(H-MT-MB);
+    const h2 = ((ends[m]||0)/max)*(H-MT-MB);
+    const yBase = H-MB;
+    svg += `<rect x="${x}" y="${yBase-h1}" width="${barW/2}" height="${h1}" fill="#3b82f6" rx="2"/>`;
+    svg += `<rect x="${x+barW/2}" y="${yBase-h2}" width="${barW/2}" height="${h2}" fill="#22c55e" rx="2"/>`;
+    if((starts[m]||0)>0) svg += `<text x="${x+barW/4}" y="${yBase-h1-4}" text-anchor="middle" font-size="9" fill="#3b82f6">${starts[m]}</text>`;
+    if((ends[m]||0)>0) svg += `<text x="${x+barW*0.75}" y="${yBase-h2-4}" text-anchor="middle" font-size="9" fill="#22c55e">${ends[m]}</text>`;
+    svg += `<text x="${x+barW/2}" y="${H-MB+14}" text-anchor="middle" font-size="10" fill="#64748b">${m}</text>`;
+  });
+  svg += `<rect x="${W-150}" y="6" width="10" height="10" fill="#3b82f6" rx="2"/><text x="${W-136}" y="15" font-size="11" fill="#334155">停课</text>`;
+  svg += `<rect x="${W-90}" y="6" width="10" height="10" fill="#22c55e" rx="2"/><text x="${W-76}" y="15" font-size="11" fill="#334155">预计复课</text>`;
+  svg += `</svg>`;
+  $('trendChart').innerHTML = svg;
+}
+function drawReasonChart(rows){
+  const cnt = {};
+  rows.forEach(s=>{ const r=(s.reason||'').trim()||'未填写'; cnt[r]=(cnt[r]||0)+1; });
+  const items = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(items.length===0){ $('reasonChart').innerHTML='<div class="chart-empty">无数据</div>'; return; }
+  const max = Math.max(1, ...items.map(i=>i[1]));
+  const W=680, H=220, ML=132, MR=34, MT=10, MB=10, BH=17, GAP=5;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+  items.forEach((it, i)=>{
+    const y = MT + i*(BH+GAP);
+    const w = (it[1]/max)*(W-ML-MR);
+    const label = it[0].length>11 ? it[0].slice(0,10)+'…' : it[0];
+    svg += `<text x="${ML-8}" y="${y+BH/2+4}" text-anchor="end" font-size="11" fill="#334155">${label}</text>`;
+    svg += `<rect x="${ML}" y="${y}" width="${w}" height="${BH}" fill="#f59e0b" rx="3"/>`;
+    svg += `<text x="${ML+w+5}" y="${y+BH/2+4}" font-size="11" fill="#334155">${it[1]}</text>`;
+  });
+  svg += `</svg>`;
+  $('reasonChart').innerHTML = svg;
+}
+function wakeAdvice(stopped, remain, reason){
+  const r = (reason||'').toLowerCase();
+  if(r.includes('退费') || r.includes('退') || r.includes('refund'))
+    return '💰 <b>退费风险</b>：优先安抚家长情绪，了解具体退费原因，立即转主管/售后处理，不要强行推销复课。';
+  if(remain !== '-' && remain <= 3 && remain >= 0)
+    return '⏰ <b>即将到期</b>：今明两天必须电话回访，确认是否复课；若不复课马上沟通续停或转化方案。';
+  if(r.includes('旅游') || r.includes('外出') || r.includes('travel') || r.includes('trip'))
+    return '✈️ <b>外出旅游</b>：确认返程/回城时间，提前 2-3 天预约复课，发送近期课程安排。';
+  if(r.includes('学业') || r.includes('忙') || r.includes('时间') || r.includes('school'))
+    return '📚 <b>学业繁忙</b>：协商降低上课频次或更换更灵活时段，提供短期体验课降低复课门槛。';
+  if(r.includes('家长') || r.includes('要求') || r.includes('不同意'))
+    return '👨‍👩‍👧 <b>家长意愿</b>：了解家长核心顾虑（效果/时间/费用），提供 1 对 1 学情分析或试听方案。';
+  if(stopped !== '-' && stopped <= 3)
+    return '⭐ <b>黄金唤醒期</b>：48 小时内电话回访，了解停课原因，推荐最近好课/原主讲老师时间。';
+  if(stopped !== '-' && stopped <= 7)
+    return '📞 <b>常规跟进</b>：本周内电话沟通，给出补课或调整时间方案，防止进入长期停课。';
+  if(stopped !== '-' && stopped >= 30)
+    return '⛔ <b>超高危停课</b>：已停超 30 天，大概率已流失；主管必须介入，尝试最后一次专属召回或确认退费意向。';
+  if(stopped !== '-' && stopped >= 21)
+    return '🔴 <b>长期停课</b>：已停超 3 周，需深度回访判断是否流失/转竞品；建议升级主管介入。';
+  return '🟡 <b>持续跟进</b>：定期电话/企微保持联系，结合孩子兴趣点推送内容，防止静默流失。';
+}
+function switchTab(tabId){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tabId));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active', c.id===tabId));
+  if(tabId==='tabSuspend') renderSus();
+}
+fillSel('fSusLp', uniq(SUS.map(s=>s.lp)));
+$('fSusLp').onchange = renderSus;
+$('fSusRange').onchange = ()=>{ SUS_RANGE = $('fSusRange').value; renderSus(); };
+
+renderTimeline(); syncHourHighlight();
+clearAllFilters(); render(); renderSus(); renderLate(); renderPrevFollow();
+loadLate();                       // 页面加载时异步拉取最新迟到数据
+setInterval(loadLate, 30000);     // 每 30 秒自动刷新迟到 Tab
+setInterval(loadHealth, 30000);    // 每 30 秒拉取守护健康度
+setInterval(render, 60000); // 每分钟重算"即将开课"高亮
+</script>
+</body>
+</html>
