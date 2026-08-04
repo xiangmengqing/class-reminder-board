@@ -1,10 +1,10 @@
 {
   "date": "2026-08-04",
-  "generated_at": "2026-08-04 20:43:11",
+  "generated_at": "2026-08-04 23:39:56",
   "grace": 3,
   "count": 1,
-  "total": 8,
-  "last_patrol": "2026-08-04 20:43:11",
+  "total": 9,
+  "last_patrol": "2026-08-04 23:39:56",
   "daemon_ok": true,
   "late": [
     {
@@ -50,13 +50,29 @@
       "wandou_id": "28288045",
       "start": "20:10",
       "end": "20:50",
-      "minutes": 33,
+      "minutes": 38,
       "teacher": "Tess Kervin（Tess Kervin）",
       "course": "S4_3 阳光不可食用",
       "live_id": 17411128,
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
+      "status": "absent"
+    },
+    {
+      "lp": "迟月",
+      "group": "美澳3组",
+      "student": "Clea",
+      "wandou_id": "28520533",
+      "start": "23:00",
+      "end": "23:40",
+      "minutes": 39,
+      "teacher": "兔耳老师（洪慕佩）",
+      "course": "S6_4 桶桶星的光环",
+      "live_id": 17411943,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 0,
       "status": "late"
     },
     {
