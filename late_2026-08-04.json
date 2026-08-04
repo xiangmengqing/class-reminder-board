@@ -1,10 +1,10 @@
 {
   "date": "2026-08-04",
-  "generated_at": "2026-08-04 19:08:19",
+  "generated_at": "2026-08-04 19:09:54",
   "grace": 3,
-  "count": 4,
+  "count": 3,
   "total": 4,
-  "last_patrol": "2026-08-04 19:08:19",
+  "last_patrol": "2026-08-04 19:09:54",
   "daemon_ok": true,
   "late": [
     {
@@ -14,7 +14,7 @@
       "wandou_id": "22724646",
       "start": "18:30",
       "end": "19:10",
-      "minutes": 38,
+      "minutes": 39,
       "teacher": "茶杯老師（方墉）",
       "course": "S8_3 數字王國的判官（上）",
       "live_id": 17410395,
@@ -30,7 +30,7 @@
       "wandou_id": "28226718",
       "start": "18:30",
       "end": "19:10",
-      "minutes": 38,
+      "minutes": 39,
       "teacher": "小潘潘老师（潘黎）",
       "course": "S6_7 蓝帽子上校",
       "live_id": 17412151,
@@ -53,7 +53,7 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "late"
+      "status": "entered"
     },
     {
       "lp": "韩明昭",
@@ -62,7 +62,7 @@
       "wandou_id": "26401594",
       "start": "18:30",
       "end": "19:10",
-      "minutes": 38,
+      "minutes": 39,
       "teacher": "奧特老師（陈逸飞）",
       "course": "S8_3 數字王國的判官（上）",
       "live_id": 17407301,
