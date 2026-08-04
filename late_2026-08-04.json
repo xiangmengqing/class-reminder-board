@@ -1,10 +1,10 @@
 {
   "date": "2026-08-04",
-  "generated_at": "2026-08-04 20:10:02",
+  "generated_at": "2026-08-04 20:43:11",
   "grace": 3,
-  "count": 0,
-  "total": 7,
-  "last_patrol": "2026-08-04 20:10:02",
+  "count": 1,
+  "total": 8,
+  "last_patrol": "2026-08-04 20:43:11",
   "daemon_ok": true,
   "late": [
     {
@@ -42,6 +42,22 @@
       "status": "absent",
       "final_status": "请假",
       "final_reason": "事假"
+    },
+    {
+      "lp": "李欣旭",
+      "group": "美澳3组",
+      "student": "宣诺",
+      "wandou_id": "28288045",
+      "start": "20:10",
+      "end": "20:50",
+      "minutes": 33,
+      "teacher": "Tess Kervin（Tess Kervin）",
+      "course": "S4_3 阳光不可食用",
+      "live_id": 17411128,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
     },
     {
       "lp": "迟月",
