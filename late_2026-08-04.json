@@ -1,10 +1,10 @@
 {
   "date": "2026-08-04",
-  "generated_at": "2026-08-04 19:59:27",
+  "generated_at": "2026-08-04 20:10:02",
   "grace": 3,
-  "count": 3,
+  "count": 0,
   "total": 7,
-  "last_patrol": "2026-08-04 19:59:27",
+  "last_patrol": "2026-08-04 20:10:02",
   "daemon_ok": true,
   "late": [
     {
@@ -93,7 +93,7 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "late"
+      "status": "absent"
     },
     {
       "lp": "高庆兰",
@@ -109,7 +109,7 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "late"
+      "status": "absent"
     },
     {
       "lp": "高庆兰",
@@ -125,7 +125,7 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "late"
+      "status": "absent"
     }
   ]
 }
