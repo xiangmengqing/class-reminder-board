@@ -1,10 +1,10 @@
 {
   "date": "2026-08-04",
-  "generated_at": "2026-08-04 19:09:54",
+  "generated_at": "2026-08-04 19:25:55",
   "grace": 3,
   "count": 3,
-  "total": 4,
-  "last_patrol": "2026-08-04 19:09:54",
+  "total": 7,
+  "last_patrol": "2026-08-04 19:25:55",
   "daemon_ok": true,
   "late": [
     {
@@ -21,7 +21,9 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "late"
+      "status": "absent",
+      "final_status": "请假",
+      "final_reason": "事假"
     },
     {
       "lp": "李欣旭",
@@ -37,7 +39,9 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "late"
+      "status": "absent",
+      "final_status": "请假",
+      "final_reason": "事假"
     },
     {
       "lp": "迟月",
@@ -53,7 +57,9 @@
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
-      "status": "entered"
+      "status": "absent",
+      "final_status": "请假",
+      "final_reason": "事假"
     },
     {
       "lp": "韩明昭",
@@ -66,6 +72,56 @@
       "teacher": "奧特老師（陈逸飞）",
       "course": "S8_3 數字王國的判官（上）",
       "live_id": 17407301,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "absent",
+      "final_status": "请假",
+      "final_reason": "事假"
+    },
+    {
+      "lp": "韩明昭",
+      "group": "美澳3组",
+      "student": "Vincent",
+      "wandou_id": "24765191",
+      "start": "19:20",
+      "end": "20:00",
+      "minutes": 5,
+      "teacher": "嘉尘老师（朱福强）",
+      "course": "S8_5 经典加乘原理",
+      "live_id": 17410062,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "高庆兰",
+      "group": "美澳3组",
+      "student": "弟弟炜炜",
+      "wandou_id": "28250522",
+      "start": "19:20",
+      "end": "20:00",
+      "minutes": 5,
+      "teacher": "Skye老师（Skye老师）",
+      "course": "S2_5 皮皮虎拜师傅",
+      "live_id": 17412218,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "高庆兰",
+      "group": "美澳3组",
+      "student": "米粒",
+      "wandou_id": "28517761",
+      "start": "19:20",
+      "end": "20:00",
+      "minutes": 5,
+      "teacher": "Thomas老师01（Thomas老师）",
+      "course": "S6_7 蓝帽子上校",
+      "live_id": 17420951,
       "liveRoomStatus": 0,
       "checkStatus": 0,
       "liveStatus": 1,
