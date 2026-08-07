@@ -1,10 +1,43 @@
 {
   "date": "2026-08-08",
-  "generated_at": "2026-08-07 00:10:33",
+  "generated_at": "2026-08-08 00:35:29",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-07 00:10:33",
+  "count": 2,
+  "total": 2,
+  "last_patrol": "2026-08-08 00:35:29",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "迟月",
+      "group": "美澳3组",
+      "student": "滢滢",
+      "wandou_id": "24767651",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 35,
+      "teacher": "小爱老师（陈爱玲）",
+      "course": "S8_4 探索身边的规律",
+      "live_id": 17434175,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "高庆兰",
+      "group": "美澳3组",
+      "student": "Zachary",
+      "wandou_id": "28463267",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 35,
+      "teacher": "Gina老師（孙敬）",
+      "course": "S4_7 解救地面城",
+      "live_id": 17435475,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    }
+  ]
 }
