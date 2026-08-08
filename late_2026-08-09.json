@@ -1,10 +1,59 @@
 {
   "date": "2026-08-09",
-  "generated_at": "2026-08-08 18:08:25",
+  "generated_at": "2026-08-09 00:39:57",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-08 18:08:25",
+  "count": 1,
+  "total": 3,
+  "last_patrol": "2026-08-09 00:39:57",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "田淇",
+      "group": "美澳3组",
+      "student": "吴恒",
+      "wandou_id": "27845251",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 3,
+      "teacher": "豌豆荚老师（陈艳艳）",
+      "course": "S4_3 阳光不可食用",
+      "live_id": 17426470,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    },
+    {
+      "lp": "迟月",
+      "group": "美澳3组",
+      "student": "Joey",
+      "wandou_id": "26383399",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 3,
+      "teacher": "小小蝌蚪老师（刘珂）",
+      "course": "S7_3 必胜卡牌游戏",
+      "live_id": 17424962,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    },
+    {
+      "lp": "韩明昭",
+      "group": "美澳3组",
+      "student": "潼潼",
+      "wandou_id": "27612084",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 39,
+      "teacher": "魔力云老师（邵云云）",
+      "course": "S4_3 阳光不可食用",
+      "live_id": 17426948,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    }
+  ]
 }
