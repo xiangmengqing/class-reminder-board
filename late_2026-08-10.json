@@ -1,10 +1,59 @@
 {
   "date": "2026-08-10",
-  "generated_at": "2026-08-09 18:10:59",
+  "generated_at": "2026-08-10 00:32:37",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-09 18:10:59",
+  "count": 2,
+  "total": 3,
+  "last_patrol": "2026-08-10 00:32:37",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "田淇",
+      "group": "美澳3组",
+      "student": "桃桃",
+      "wandou_id": "28019037",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 32,
+      "teacher": "小月亮老师（彭绿洒）",
+      "course": "S4_7 解救地面城",
+      "live_id": 17431298,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "田淇",
+      "group": "美澳3组",
+      "student": "陆诗恩",
+      "wandou_id": "28650564",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 3,
+      "teacher": "小甜筒老师（赵欣）",
+      "course": "S3_7 神庙历险记",
+      "live_id": 17451832,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    },
+    {
+      "lp": "韩明昭",
+      "group": "美澳3组",
+      "student": "潼潼",
+      "wandou_id": "27612084",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 32,
+      "teacher": "椰奶老师（孙雨楠）",
+      "course": "S4_4 奇怪的像素国王",
+      "live_id": 17452730,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    }
+  ]
 }
