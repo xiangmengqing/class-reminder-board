@@ -1,10 +1,43 @@
 {
   "date": "2026-08-11",
-  "generated_at": "2026-08-10 08:20:25",
+  "generated_at": "2026-08-11 00:37:12",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-10 08:20:25",
+  "count": 1,
+  "total": 2,
+  "last_patrol": "2026-08-11 00:37:12",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "张弛",
+      "group": "美澳3组",
+      "student": "Levi Tai 戴弘轩",
+      "wandou_id": "26619756",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 37,
+      "teacher": "清沫老师（李玉晴）",
+      "course": "S6_8 符号的智慧",
+      "live_id": 17443389,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "田淇",
+      "group": "美澳3组",
+      "student": "桃桃",
+      "wandou_id": "28019037",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 5,
+      "teacher": "小月亮老师（彭绿洒）",
+      "course": "S4_8 寻找修复宝石",
+      "live_id": 17457218,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    }
+  ]
 }
