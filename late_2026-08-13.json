@@ -1,10 +1,27 @@
 {
   "date": "2026-08-13",
-  "generated_at": "2026-08-12 00:11:24",
+  "generated_at": "2026-08-13 00:36:31",
   "grace": 3,
   "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-12 00:11:24",
+  "total": 1,
+  "last_patrol": "2026-08-13 00:36:31",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "韩明昭",
+      "group": "美澳3组",
+      "student": "朱熠宸",
+      "wandou_id": "27370952",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 22,
+      "teacher": "风铃草老师（陶虹婧）",
+      "course": "S5_9 出发！冒险家",
+      "live_id": 17457348,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    }
+  ]
 }
