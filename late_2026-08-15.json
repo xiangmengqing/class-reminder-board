@@ -1,10 +1,27 @@
 {
   "date": "2026-08-15",
-  "generated_at": "2026-08-14 00:08:17",
+  "generated_at": "2026-08-15 00:36:23",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-14 00:08:17",
+  "count": 1,
+  "total": 1,
+  "last_patrol": "2026-08-15 00:36:23",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "吴迪",
+      "group": "美澳3组",
+      "student": "笑笑",
+      "wandou_id": "26141316",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 36,
+      "teacher": "小小花老师（刘晓霞）",
+      "course": "S7_8 就是这么大",
+      "live_id": 17460317,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    }
+  ]
 }
