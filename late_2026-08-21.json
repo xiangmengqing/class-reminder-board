@@ -1,10 +1,59 @@
 {
   "date": "2026-08-21",
-  "generated_at": "2026-08-20 00:10:38",
+  "generated_at": "2026-08-21 00:38:27",
   "grace": 3,
-  "count": 0,
-  "total": 0,
-  "last_patrol": "2026-08-20 00:10:38",
+  "count": 2,
+  "total": 3,
+  "last_patrol": "2026-08-21 00:38:27",
   "daemon_ok": true,
-  "late": []
+  "late": [
+    {
+      "lp": "敖勇",
+      "group": "美澳3组",
+      "student": "汤圆",
+      "wandou_id": "28454648",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 7,
+      "teacher": "南南老师（杨亚静）",
+      "course": "S3_11 果园里的跳跳",
+      "live_id": 17494552,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    },
+    {
+      "lp": "田淇",
+      "group": "美澳3组",
+      "student": "Bella",
+      "wandou_id": "28577209",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 38,
+      "teacher": "橙橙子老师（李程）",
+      "course": "S5_9 出发！冒险家",
+      "live_id": 17481416,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    },
+    {
+      "lp": "韩明昭",
+      "group": "美澳3组",
+      "student": "豆豆",
+      "wandou_id": "27250584",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 38,
+      "teacher": "清沫老师（李玉晴）",
+      "course": "S6_11 蓝帽子上校",
+      "live_id": 17494551,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "late"
+    }
+  ]
 }
