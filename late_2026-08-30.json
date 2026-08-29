@@ -1,15 +1,32 @@
 {
   "date": "2026-08-30",
-  "generated_at": "2026-08-29 18:09:10",
+  "generated_at": "2026-08-30 00:39:39",
   "grace": 3,
   "count": 0,
-  "total": 0,
+  "total": 1,
   "muted_count": 0,
   "muted_lps": [
     "田淇"
   ],
-  "last_patrol": "2026-08-29 18:09:10",
+  "last_patrol": "2026-08-30 00:39:39",
   "daemon_ok": true,
-  "late": [],
+  "late": [
+    {
+      "lp": "孙浩",
+      "group": "美澳3组",
+      "student": "添然",
+      "wandou_id": "26880225",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 7,
+      "teacher": "Soleil老师（向梦颖）",
+      "course": "S5_12 默契大挑战",
+      "live_id": 17514300,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "status": "entered"
+    }
+  ],
   "muted": []
 }
