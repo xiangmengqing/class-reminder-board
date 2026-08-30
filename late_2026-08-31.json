@@ -1,15 +1,33 @@
 {
   "date": "2026-08-31",
-  "generated_at": "2026-08-30 00:02:59",
+  "generated_at": "2026-08-31 00:39:17",
   "grace": 3,
   "count": 0,
   "total": 0,
-  "muted_count": 0,
+  "muted_count": 1,
   "muted_lps": [
     "田淇"
   ],
-  "last_patrol": "2026-08-30 00:02:59",
+  "last_patrol": "2026-08-31 00:39:17",
   "daemon_ok": true,
   "late": [],
-  "muted": []
+  "muted": [
+    {
+      "lp": "田淇",
+      "group": "美澳3组",
+      "student": "吴恒",
+      "wandou_id": "27845251",
+      "start": "00:00",
+      "end": "00:40",
+      "minutes": 39,
+      "teacher": "豌豆荚老师（陈艳艳）",
+      "course": "S4_10 寻找失落的数字宝石",
+      "live_id": 17541230,
+      "liveRoomStatus": 0,
+      "checkStatus": 0,
+      "liveStatus": 1,
+      "muted": true,
+      "status": "late"
+    }
+  ]
 }
