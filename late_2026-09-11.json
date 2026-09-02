@@ -1,6 +1,6 @@
 {
   "date": "2026-09-11",
-  "generated_at": "2026-09-02 00:27:39",
+  "generated_at": "2026-09-03 00:26:11",
   "grace": 3,
   "count": 0,
   "total": 0,
@@ -8,7 +8,7 @@
   "muted_lps": [
     "田淇"
   ],
-  "last_patrol": "2026-09-02 00:27:39",
+  "last_patrol": "2026-09-03 00:26:11",
   "daemon_ok": true,
   "late": [],
   "muted": []
